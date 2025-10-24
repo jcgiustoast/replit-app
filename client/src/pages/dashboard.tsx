@@ -196,7 +196,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-semibold" data-testid="text-page-title">Reporte Personalizado</h1>
           </div>
           <p className="text-sm text-muted-foreground" data-testid="text-page-description">
-            This report shows our top-performing Meta creative.
+            Crea tus propios reportes
           </p>
         </div>
 
