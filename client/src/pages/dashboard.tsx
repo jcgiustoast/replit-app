@@ -129,7 +129,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="h-full overflow-y-auto">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
