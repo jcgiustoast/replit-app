@@ -1,0 +1,85 @@
+Quiero que crees una **webapp full-stack** con las siguientes características, inspirada en https://motionapp.com y en la UI del dashboard de HexClad (te adjunto referencia visual):
+
+🎯 **Objetivo:**
+Una herramienta de análisis de performance de creativos para Meta Ads, que permita visualizar métricas y tendencias con la misma estética y estructura del ejemplo.
+
+---
+
+### 🧩 FUNCIONALIDADES PRINCIPALES
+
+1. **Filtros y periodo de análisis**
+   - Selector de rango de fechas (últimos 7, 14, 30 días o personalizado).
+   - Selector de nivel de desglose: *Ad name*, *Ad set name* o *Campaign name*.
+   - Selector múltiple de métricas: *Spend*, *ROAS*, *CPA*, *CTR*, *Frequency*, *Convert Score*.
+
+2. **Visualización de resultados**
+   - Opción de vista tipo:
+     - **Gráfico de barras**
+     - **Gráfico de líneas**
+     - **Vista en cuadrícula (cards)**, con las métricas por creativo (como en la imagen).
+   - Cada “card” debe mostrar:
+     - Imagen o video del creativo (mock o URL).
+     - Spend, ROAS, CPA, Convert Score.
+     - Barra de progreso visual para Convert Score.
+   - Posibilidad de ordenar por cualquier métrica.
+
+3. **Interactividad**
+   - Cambios en filtros y métricas actualizan los gráficos en tiempo real (sin recargar la página).
+   - Hover sobre métricas muestra tooltip con descripción.
+   - Responsive (funciona en desktop y mobile).
+
+4. **Datos**
+   - Usar un JSON o archivo CSV simulado con datos de creativos:
+     ```json
+     {
+       "ad_name": "Video | Gordon Dutch Oven",
+       "spend": 177985,
+       "roas": 3.5,
+       "cpa": 36,
+       "convert_score": 61,
+       "thumbnail": "url_de_imagen"
+     }
+     ```
+   - Los datos deben poder actualizarse mediante un endpoint o importación de archivo.
+
+---
+
+### 🎨 INTERFAZ / UI
+
+- Sidebar con secciones:
+  - Home
+  - Explore Agents
+  - Reports
+  - “What’s Working”
+  - “What’s Not Working”
+  - Launch Analysis
+- En el panel principal:
+  - Título “⭐ Top Creatives”
+  - Filtros arriba (fechas, métricas, nivel de desglose)
+  - Contenedor dinámico con gráficos o cards
+- Diseño limpio tipo **Notion + MotionApp**, con fondo blanco, tipografía sans-serif, sombras suaves y tonos neutros.
+- Framework sugerido: **React + TailwindCSS + Recharts (para gráficos)**.
+
+---
+
+### ⚙️ STACK TÉCNICO
+
+- **Frontend:** React + TailwindCSS + Recharts (gráficos).
+- **Backend:** FastAPI o Express.js (simulación de endpoints).
+- **Base de datos:** CSV o archivo JSON local (puede escalar a PostgreSQL).
+- **Hosting:** Replit, con hot reload y estado persistente.
+
+---
+
+### 🧩 BONUS FEATURES (opcional)
+- Sistema de login básico (simulado con un usuario “demo”).
+- Botón “Create Report” que genera un resumen automático (ejemplo: top 10 creativos, métricas promedio).
+- Exportar vista actual en CSV o PDF.
+
+---
+
+🧠 **Resumen:**
+Construí una webapp estilo *creative analytics dashboard* para Meta Ads, con UX similar a MotionApp, filtros dinámicos, vista de métricas por creativo y gráficos personalizables.
+
+El resultado final debe ser **una aplicación visual, interactiva y con estética profesional**, ideal para analizar performance publicitaria.
+
