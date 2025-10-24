@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -10,12 +10,23 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 import type { Creative } from "@shared/schema";
 
 interface CreativesTableProps {
   creatives: Creative[];
   selectedMetrics: string[];
 }
+
+const ITEMS_PER_PAGE = 8;
 
 const METRIC_LABELS: Record<string, string> = {
   spend: "Spend",
@@ -30,13 +41,40 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const sortedCreatives = [...creatives].sort((a, b) => {
+    if (!sortBy) return 0;
+    const aVal = a[sortBy as keyof Creative];
+    const bVal = b[sortBy as keyof Creative];
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
+    }
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedCreatives.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedCreatives = sortedCreatives.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const toggleAll = () => {
-    if (selectedIds.size === creatives.length) {
-      setSelectedIds(new Set());
+    const currentPageIds = paginatedCreatives.map(c => c.id);
+    const allCurrentPageSelected = currentPageIds.every(id => selectedIds.has(id));
+    
+    const newSelected = new Set(selectedIds);
+    if (allCurrentPageSelected) {
+      currentPageIds.forEach(id => newSelected.delete(id));
     } else {
-      setSelectedIds(new Set(creatives.map(c => c.id)));
+      currentPageIds.forEach(id => newSelected.add(id));
     }
+    setSelectedIds(newSelected);
   };
 
   const toggleRow = (id: string) => {
@@ -56,18 +94,8 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
       setSortBy(metric);
       setSortOrder("desc");
     }
-    console.log('Sorting by:', metric, sortOrder === "asc" ? "desc" : "asc");
+    setCurrentPage(1);
   };
-
-  const sortedCreatives = [...creatives].sort((a, b) => {
-    if (!sortBy) return 0;
-    const aVal = a[sortBy as keyof Creative];
-    const bVal = b[sortBy as keyof Creative];
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
-    }
-    return 0;
-  });
 
   const formatValue = (metric: string, value: number) => {
     switch (metric) {
@@ -91,18 +119,20 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
     }
   };
 
-  const allSelected = selectedIds.size === creatives.length && creatives.length > 0;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < creatives.length;
+  const currentPageIds = paginatedCreatives.map(c => c.id);
+  const allCurrentPageSelected = currentPageIds.length > 0 && currentPageIds.every(id => selectedIds.has(id));
+  const someCurrentPageSelected = currentPageIds.some(id => selectedIds.has(id)) && !allCurrentPageSelected;
+  
+  const checkboxState = allCurrentPageSelected ? true : (someCurrentPageSelected ? "indeterminate" : false);
 
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-lg mb-8">
       <div className="p-4 border-b bg-muted/30">
         <div className="flex items-center gap-2">
           <Checkbox
-            checked={allSelected}
+            checked={checkboxState}
             onCheckedChange={toggleAll}
             aria-label="Select all"
-            className={someSelected ? "data-[state=checked]:bg-primary/50" : ""}
             data-testid="checkbox-select-all"
           />
           <span className="text-sm font-medium">
@@ -139,7 +169,7 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedCreatives.map((creative) => (
+            {paginatedCreatives.map((creative) => (
               <TableRow
                 key={creative.id}
                 className={selectedIds.has(creative.id) ? "bg-muted/50" : ""}
@@ -181,6 +211,77 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
           </TableBody>
         </Table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="p-4 border-t">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={(e) => {
+                    if (currentPage === 1) {
+                      e.preventDefault();
+                      return;
+                    }
+                    setCurrentPage(currentPage - 1);
+                  }}
+                  aria-disabled={currentPage === 1}
+                  className={currentPage === 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                  data-testid="button-previous-page"
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                const showPage =
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1);
+
+                const showEllipsisBefore = page === currentPage - 2 && currentPage > 3;
+                const showEllipsisAfter = page === currentPage + 2 && currentPage < totalPages - 2;
+
+                if (showEllipsisBefore || showEllipsisAfter) {
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                if (!showPage) return null;
+
+                return (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                      data-testid={`button-page-${page}`}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={(e) => {
+                    if (currentPage === totalPages) {
+                      e.preventDefault();
+                      return;
+                    }
+                    setCurrentPage(currentPage + 1);
+                  }}
+                  aria-disabled={currentPage === totalPages}
+                  className={currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                  data-testid="button-next-page"
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }
