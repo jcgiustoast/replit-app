@@ -88,8 +88,8 @@ export function AppSidebar() {
             <SidebarMenu>
               {savedReports.map((report) => (
                 <SidebarMenuItem key={report.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger className="w-full">
                       <SidebarMenuButton 
                         asChild 
                         isActive={location === `/report/${report.id}`}
