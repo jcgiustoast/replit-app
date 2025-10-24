@@ -4,6 +4,7 @@ import { CreativeCard } from "@/components/creative-card";
 import { FilterBar } from "@/components/filter-bar";
 import { ViewModeToggle, type ViewMode } from "@/components/view-mode-toggle";
 import { ChartView } from "@/components/chart-view";
+import { CreativesTable } from "@/components/creatives-table";
 import type { Creative } from "@shared/schema";
 
 // TODO: remove mock functionality - this data should come from the API
@@ -151,19 +152,28 @@ export default function Dashboard() {
           <ViewModeToggle value={viewMode} onChange={setViewMode} />
         </div>
 
-        {viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedCreatives.map((creative) => (
-              <CreativeCard key={creative.id} creative={creative} />
-            ))}
-          </div>
-        ) : (
-          <ChartView 
+        <div className="mb-8">
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedCreatives.map((creative) => (
+                <CreativeCard key={creative.id} creative={creative} />
+              ))}
+            </div>
+          ) : (
+            <ChartView 
+              creatives={sortedCreatives} 
+              mode={viewMode} 
+              metrics={selectedMetrics}
+            />
+          )}
+        </div>
+
+        <div>
+          <CreativesTable 
             creatives={sortedCreatives} 
-            mode={viewMode} 
-            metrics={selectedMetrics}
+            selectedMetrics={selectedMetrics}
           />
-        )}
+        </div>
       </div>
     </div>
   );
