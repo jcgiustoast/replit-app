@@ -26,20 +26,81 @@ const METRIC_LABELS: Record<string, string> = {
   convertScore: "Convert Score",
 };
 
-// Métricas que van en el eje izquierdo (valores grandes, moneda)
 const LEFT_AXIS_METRICS = ["spend", "cpa"];
-// Métricas que van en el eje derecho (valores pequeños, ratios, porcentajes)
 const RIGHT_AXIS_METRICS = ["roas", "ctr", "frequency", "convertScore"];
 
+interface CustomTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value: string;
+    index: number;
+  };
+  creativeData?: Array<{ thumbnail: string; adName: string }>;
+}
+
+const CustomXAxisTick = ({ x = 0, y = 0, payload, creativeData }: CustomTickProps) => {
+  if (!payload || !creativeData) return null;
+  
+  const creative = creativeData[payload.index];
+  if (!creative) return null;
+
+  const shortName = creative.adName.length > 15 
+    ? creative.adName.substring(0, 15) + '...' 
+    : creative.adName;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <foreignObject x={-30} y={0} width={60} height={90}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          gap: '4px'
+        }}>
+          <img 
+            src={creative.thumbnail} 
+            alt={creative.adName}
+            style={{ 
+              width: '50px', 
+              height: '50px', 
+              borderRadius: '8px',
+              objectFit: 'cover',
+              border: '2px solid hsl(var(--border))'
+            }}
+          />
+          <div style={{ 
+            fontSize: '11px', 
+            color: 'hsl(var(--muted-foreground))',
+            textAlign: 'center',
+            lineHeight: '1.2',
+            maxWidth: '60px',
+            wordWrap: 'break-word'
+          }}>
+            {shortName}
+          </div>
+        </div>
+      </foreignObject>
+    </g>
+  );
+};
+
 export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
-  const data = creatives.slice(0, 10).map(creative => ({
-    name: creative.adName.length > 20 ? creative.adName.substring(0, 20) + '...' : creative.adName,
+  const limitedCreatives = creatives.slice(0, 10);
+  
+  const data = limitedCreatives.map(creative => ({
+    name: creative.adName,
     spend: creative.spend,
     roas: creative.roas,
     cpa: creative.cpa,
     ctr: creative.ctr,
     frequency: creative.frequency,
     convertScore: creative.convertScore,
+  }));
+
+  const creativeData = limitedCreatives.map(c => ({
+    thumbnail: c.thumbnail,
+    adName: c.adName
   }));
 
   const leftAxisMetrics = metrics.filter(m => LEFT_AXIS_METRICS.includes(m));
@@ -74,16 +135,15 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
 
   return (
     <Card className="p-6">
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={450}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar">
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 100, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-              angle={-45}
-              textAnchor="end"
-              height={100}
+              tick={<CustomXAxisTick creativeData={creativeData} />}
+              height={120}
+              interval={0}
             />
             {leftAxisMetrics.length > 0 && (
               <YAxis 
@@ -127,14 +187,13 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line">
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 100, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-              angle={-45}
-              textAnchor="end"
-              height={100}
+              tick={<CustomXAxisTick creativeData={creativeData} />}
+              height={120}
+              interval={0}
             />
             {leftAxisMetrics.length > 0 && (
               <YAxis 

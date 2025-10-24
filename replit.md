@@ -53,6 +53,8 @@ Preferred communication style: Simple, everyday language.
 - Recharts library for bar and line chart components
 - Custom chart configurations with dual Y-axes (left for currency values, right for ratios/percentages)
 - Grid card view for creative thumbnails with key metrics
+- Custom X-axis ticks displaying creative thumbnail images alongside ad names
+- foreignObject-based rendering for rich X-axis labels with images (50x50px thumbnails, rounded corners, borders)
 
 **Form Handling**
 - React Hook Form for form state management
