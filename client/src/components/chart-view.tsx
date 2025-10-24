@@ -149,15 +149,15 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
   };
 
   return (
-    <Card className="p-4">
-      <ResponsiveContainer width="100%" height={720}>
+    <Card className="px-4 pt-4 pb-0">
+      <ResponsiveContainer width="100%" height={870}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 130, top: 20, left: 10, right: 10 }}>
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 0, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={105}
+              tick={false}
+              height={0}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
@@ -178,7 +178,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom"
-              wrapperStyle={{ fontSize: 14, paddingTop: '20px', paddingBottom: '10px' }}
+              wrapperStyle={{ fontSize: 14, paddingTop: '0px', paddingBottom: '0px', marginBottom: '0px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
@@ -203,12 +203,12 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 130, top: 20, left: 10, right: 10 }}>
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 0, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={105}
+              tick={false}
+              height={0}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
@@ -229,7 +229,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom"
-              wrapperStyle={{ fontSize: 14, paddingTop: '20px', paddingBottom: '10px' }}
+              wrapperStyle={{ fontSize: 14, paddingTop: '0px', paddingBottom: '0px', marginBottom: '0px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
