@@ -45,42 +45,57 @@ const CustomXAxisTick = ({ x = 0, y = 0, payload, creativeData }: CustomTickProp
   const creative = creativeData[payload.index];
   if (!creative) return null;
 
-  const shortName = creative.adName.length > 15 
-    ? creative.adName.substring(0, 15) + '...' 
+  const shortName = creative.adName.length > 20 
+    ? creative.adName.substring(0, 20) + '...' 
     : creative.adName;
 
+  const imageSize = 70;
+  const imageX = (x || 0) - imageSize / 2;
+  const imageY = (y || 0);
+
   return (
-    <g transform={`translate(${x},${y})`}>
-      <foreignObject x={-30} y={0} width={60} height={90}>
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center',
-          gap: '4px'
-        }}>
-          <img 
-            src={creative.thumbnail} 
-            alt={creative.adName}
-            style={{ 
-              width: '50px', 
-              height: '50px', 
-              borderRadius: '8px',
-              objectFit: 'cover',
-              border: '2px solid hsl(var(--border))'
-            }}
-          />
-          <div style={{ 
-            fontSize: '11px', 
-            color: 'hsl(var(--muted-foreground))',
-            textAlign: 'center',
-            lineHeight: '1.2',
-            maxWidth: '60px',
-            wordWrap: 'break-word'
-          }}>
-            {shortName}
-          </div>
-        </div>
-      </foreignObject>
+    <g>
+      {/* Border rectangle */}
+      <rect
+        x={imageX - 2}
+        y={imageY - 2}
+        width={imageSize + 4}
+        height={imageSize + 4}
+        rx={8}
+        fill="none"
+        stroke="hsl(var(--border))"
+        strokeWidth={2}
+      />
+      {/* Clip path for rounded corners */}
+      <defs>
+        <clipPath id={`clip-${payload.index}`}>
+          <rect x={imageX} y={imageY} width={imageSize} height={imageSize} rx={6} />
+        </clipPath>
+      </defs>
+      {/* Image */}
+      <image
+        href={creative.thumbnail}
+        x={imageX}
+        y={imageY}
+        width={imageSize}
+        height={imageSize}
+        clipPath={`url(#clip-${payload.index})`}
+        preserveAspectRatio="xMidYMid slice"
+      />
+      {/* Text label */}
+      <text
+        x={x || 0}
+        y={imageY + imageSize + 15}
+        textAnchor="middle"
+        fontSize={11}
+        fill="hsl(var(--muted-foreground))"
+      >
+        {shortName.split(' ').map((word, i) => (
+          <tspan key={i} x={x || 0} dy={i === 0 ? 0 : 12}>
+            {word}
+          </tspan>
+        ))}
+      </text>
     </g>
   );
 };
@@ -135,14 +150,14 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
 
   return (
     <Card className="p-6">
-      <ResponsiveContainer width="100%" height={450}>
+      <ResponsiveContainer width="100%" height={650}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 100, top: 20, left: 10, right: 10 }}>
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 120, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
               tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={120}
+              height={130}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
@@ -187,12 +202,12 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 100, top: 20, left: 10, right: 10 }}>
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 120, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
               tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={120}
+              height={130}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
