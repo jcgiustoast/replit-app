@@ -101,7 +101,7 @@ const CustomXAxisTick = ({ x = 0, y = 0, payload, creativeData }: CustomTickProp
 };
 
 export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
-  const limitedCreatives = creatives.slice(0, 10);
+  const limitedCreatives = creatives.slice(0, 6);
   
   const data = limitedCreatives.map(creative => ({
     name: creative.adName,
@@ -150,7 +150,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
 
   return (
     <Card className="p-6">
-      <ResponsiveContainer width="100%" height={850}>
+      <ResponsiveContainer width="100%" height={500}>
         {mode === "bar" ? (
           <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 110, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
