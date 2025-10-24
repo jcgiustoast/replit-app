@@ -1,5 +1,6 @@
-import { Home, Users, FileText, TrendingUp, TrendingDown, BarChart3, Settings } from "lucide-react";
+import { Home, Users, FileText, TrendingUp, TrendingDown, BarChart3, Settings, FileBarChart } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +12,12 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import type { SavedReport } from "@shared/schema";
 
 const menuItems = [
   { title: "Home", url: "/", icon: Home },
@@ -26,6 +33,10 @@ const analysisItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
+  
+  const { data: savedReports = [] } = useQuery<SavedReport[]>({
+    queryKey: ["/api/saved-reports"],
+  });
 
   return (
     <Sidebar>
@@ -65,6 +76,37 @@ export function AppSidebar() {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Reportes guardados</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {savedReports.map((report) => (
+                <SidebarMenuItem key={report.id}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton 
+                        asChild 
+                        isActive={location === `/report/${report.id}`}
+                        data-testid={`link-saved-report-${report.id}`}
+                      >
+                        <Link href={`/report/${report.id}`}>
+                          <FileBarChart className="w-4 h-4" />
+                          <span>{report.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    {report.description && (
+                      <TooltipContent side="right" className="max-w-xs">
+                        <p>{report.description}</p>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

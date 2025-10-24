@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, Save } from "lucide-react";
 import { CreativeCard } from "@/components/creative-card";
 import { FilterBar } from "@/components/filter-bar";
 import { ViewModeToggle, type ViewMode } from "@/components/view-mode-toggle";
 import { ChartView } from "@/components/chart-view";
 import { CreativesTable } from "@/components/creatives-table";
+import { SaveReportDialog } from "@/components/save-report-dialog";
+import { Button } from "@/components/ui/button";
 import type { Creative } from "@shared/schema";
 
 // TODO: remove mock functionality - this data should come from the API
@@ -108,6 +110,7 @@ export default function Dashboard() {
   const [selectedMetrics, setSelectedMetrics] = useState(["spend", "roas", "cpa", "convertScore"]);
   const [sortBy, setSortBy] = useState<keyof Creative>("spend");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
   const handleMetricsChange = (metrics: string[]) => {
     setSelectedMetrics(metrics);
@@ -149,7 +152,17 @@ export default function Dashboard() {
               onMetricsChange={handleMetricsChange}
             />
           </div>
-          <ViewModeToggle value={viewMode} onChange={setViewMode} />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSaveDialogOpen(true)}
+              data-testid="button-save-report"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Guardar Reporte
+            </Button>
+            <ViewModeToggle value={viewMode} onChange={setViewMode} />
+          </div>
         </div>
 
         <div className="mb-8">
@@ -175,6 +188,12 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      <SaveReportDialog
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        metrics={selectedMetrics}
+      />
     </div>
   );
 }

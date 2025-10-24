@@ -24,6 +24,14 @@ export const creatives = pgTable("creatives", {
   date: timestamp("date").notNull().defaultNow(),
 });
 
+export const savedReports = pgTable("saved_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  metrics: text("metrics").notNull().array(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -34,7 +42,14 @@ export const insertCreativeSchema = createInsertSchema(creatives).omit({
   date: true,
 });
 
+export const insertSavedReportSchema = createInsertSchema(savedReports).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Creative = typeof creatives.$inferSelect;
 export type InsertCreative = z.infer<typeof insertCreativeSchema>;
+export type SavedReport = typeof savedReports.$inferSelect;
+export type InsertSavedReport = z.infer<typeof insertSavedReportSchema>;
