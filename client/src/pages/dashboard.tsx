@@ -193,7 +193,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <Star className="w-5 h-5 text-chart-4 fill-chart-4" />
-            <h1 className="text-2xl font-semibold" data-testid="text-page-title">Top Creatives</h1>
+            <h1 className="text-2xl font-semibold" data-testid="text-page-title">Reporte Personalizado</h1>
           </div>
           <p className="text-sm text-muted-foreground" data-testid="text-page-description">
             This report shows our top-performing Meta creative.

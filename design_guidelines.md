@@ -18,7 +18,7 @@
 - **Monospace**: JetBrains Mono for numeric data and metrics
 
 ### Hierarchy
-- **Page Titles**: text-2xl font-semibold (⭐ Top Creatives, Reports)
+- **Page Titles**: text-2xl font-semibold (⭐ Reporte Personalizado, Reports)
 - **Section Headers**: text-lg font-medium (filter group labels, card section titles)
 - **Metric Labels**: text-sm font-medium tracking-tight (ROAS, CPA, Spend labels)
 - **Metric Values**: text-2xl font-semibold tabular-nums for large metrics, text-lg font-semibold tabular-nums for card metrics
