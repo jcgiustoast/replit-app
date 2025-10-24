@@ -15,6 +15,13 @@ The application is inspired by MotionApp's clean design principles and HexClad's
 - Each saved report preserves the selected metrics for consistent analysis
 - Dedicated saved report pages showing the configured view
 
+**Dark/Light Mode Toggle**
+- Theme toggle button in the top-right corner of the header
+- Seamless switching between light and dark themes
+- Theme preference persists across sessions via localStorage
+- All UI components automatically adapt to the selected theme
+- Smooth color transitions throughout the application
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -32,12 +39,14 @@ Preferred communication style: Simple, everyday language.
 - shadcn/ui component library built on Radix UI primitives
 - Tailwind CSS for utility-first styling with custom design tokens
 - Design system follows "new-york" style variant with neutral base color
-- Custom CSS variables for theming (light/dark mode support)
+- Custom CSS variables for theming with full light/dark mode support
+- ThemeProvider component manages global theme state via React Context
 - Typography: Inter/SF Pro Display for UI, JetBrains Mono for numeric data
 
 **State Management**
 - TanStack Query (React Query) for server state management and caching
 - Query client configured with infinite stale time and no automatic refetching
+- React Context for global theme state management (ThemeProvider)
 - Local component state with React hooks for UI interactions
 
 **Data Visualization**
