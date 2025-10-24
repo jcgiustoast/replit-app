@@ -85,7 +85,7 @@ const CustomXAxisTick = ({ x = 0, y = 0, payload, creativeData }: CustomTickProp
       {/* Text label */}
       <text
         x={x || 0}
-        y={imageY + imageSize + 15}
+        y={imageY + imageSize + 10}
         textAnchor="middle"
         fontSize={11}
         fill="hsl(var(--muted-foreground))"
@@ -150,14 +150,14 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
 
   return (
     <Card className="p-6">
-      <ResponsiveContainer width="100%" height={650}>
+      <ResponsiveContainer width="100%" height={850}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 120, top: 20, left: 10, right: 10 }}>
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 110, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
               tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={130}
+              height={105}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
@@ -202,12 +202,12 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 120, top: 20, left: 10, right: 10 }}>
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 110, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
               tick={<CustomXAxisTick creativeData={creativeData} />}
-              height={130}
+              height={105}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
