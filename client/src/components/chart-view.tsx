@@ -177,7 +177,8 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             )}
             <Tooltip content={<CustomTooltip />} />
             <Legend 
-              wrapperStyle={{ fontSize: 14 }}
+              verticalAlign="bottom"
+              wrapperStyle={{ fontSize: 14, paddingTop: '30px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
@@ -227,7 +228,8 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             )}
             <Tooltip content={<CustomTooltip />} />
             <Legend 
-              wrapperStyle={{ fontSize: 14 }}
+              verticalAlign="bottom"
+              wrapperStyle={{ fontSize: 14, paddingTop: '30px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
