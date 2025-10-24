@@ -149,10 +149,10 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
   };
 
   return (
-    <Card className="p-6">
-      <ResponsiveContainer width="100%" height={500}>
+    <Card className="p-4">
+      <ResponsiveContainer width="100%" height={720}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 110, top: 20, left: 10, right: 10 }}>
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 130, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
@@ -178,7 +178,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom"
-              wrapperStyle={{ fontSize: 14, paddingTop: '30px' }}
+              wrapperStyle={{ fontSize: 14, paddingTop: '20px', paddingBottom: '10px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
@@ -203,7 +203,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 110, top: 20, left: 10, right: 10 }}>
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 130, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
@@ -229,7 +229,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom"
-              wrapperStyle={{ fontSize: 14, paddingTop: '30px' }}
+              wrapperStyle={{ fontSize: 14, paddingTop: '20px', paddingBottom: '10px' }}
               iconType="circle"
             />
             {leftAxisMetrics.map((metric) => (
