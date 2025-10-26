@@ -44,6 +44,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update a saved report
+  app.patch("/api/saved-reports/:id", async (req, res) => {
+    try {
+      const updates = insertSavedReportSchema.partial().parse(req.body);
+      const report = await storage.updateSavedReport(req.params.id, updates);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid report data" });
+    }
+  });
+
   // Delete a saved report
   app.delete("/api/saved-reports/:id", async (req, res) => {
     try {

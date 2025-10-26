@@ -12,6 +12,7 @@ export interface IStorage {
   getSavedReports(): Promise<SavedReport[]>;
   getSavedReport(id: string): Promise<SavedReport | undefined>;
   createSavedReport(report: InsertSavedReport): Promise<SavedReport>;
+  updateSavedReport(id: string, updates: Partial<InsertSavedReport>): Promise<SavedReport | undefined>;
   deleteSavedReport(id: string): Promise<boolean>;
 
   getFolders(): Promise<Folder[]>;
@@ -174,6 +175,24 @@ export class MemStorage implements IStorage {
     };
     this.savedReports.set(id, report);
     return report;
+  }
+
+  async updateSavedReport(id: string, updates: Partial<InsertSavedReport>): Promise<SavedReport | undefined> {
+    const existing = this.savedReports.get(id);
+    if (!existing) {
+      return undefined;
+    }
+
+    const updated: SavedReport = {
+      ...existing,
+      name: updates.name ?? existing.name,
+      description: updates.description !== undefined ? updates.description : existing.description,
+      metrics: updates.metrics !== undefined ? updates.metrics : existing.metrics,
+      folderId: updates.folderId !== undefined ? updates.folderId : existing.folderId,
+    };
+
+    this.savedReports.set(id, updated);
+    return updated;
   }
 
   async deleteSavedReport(id: string): Promise<boolean> {
