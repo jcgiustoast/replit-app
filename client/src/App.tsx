@@ -21,10 +21,6 @@ function Router() {
       <Route path="/create-report" component={CreateReport} />
       <Route path="/report/:id" component={SavedReportPage} />
       <Route path="/folder/:id" component={FolderDetail} />
-      <Route path="/explore" component={NotFound} />
-      <Route path="/reports" component={NotFound} />
-      <Route path="/working" component={NotFound} />
-      <Route path="/not-working" component={NotFound} />
       <Route path="/launch" component={NotFound} />
       <Route path="/settings" component={NotFound} />
       <Route component={NotFound} />

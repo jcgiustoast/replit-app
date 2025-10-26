@@ -1,4 +1,4 @@
-import { Home, Users, FileText, TrendingUp, TrendingDown, BarChart3, Settings, FileBarChart } from "lucide-react";
+import { Home, TrendingUp, TrendingDown, BarChart3, Settings, FileBarChart } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -22,8 +22,6 @@ import type { SavedReport } from "@shared/schema";
 const menuItems = [
   { title: "Overview", url: "/", icon: Home },
   { title: "Create report", url: "/create-report", icon: FileBarChart },
-  { title: "Explore Agents", url: "/explore", icon: Users },
-  { title: "Reports", url: "/reports", icon: FileText },
 ];
 
 const analysisItems = [
