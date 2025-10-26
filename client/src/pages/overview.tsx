@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FolderIcon, Clock } from "lucide-react";
+import { Plus, FolderIcon, Clock, BarChart3, UserPlus } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -32,6 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Overview() {
   const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: folders = [], isLoading: foldersLoading } = useQuery<Folder[]>({
@@ -137,6 +138,44 @@ export default function Overview() {
             </div>
           </Card>
         </Link>
+
+        <Link href="/analitica" data-testid="link-analitica">
+          <Card className="p-6 hover-elevate cursor-pointer h-full">
+            <div className="flex flex-col items-start gap-3">
+              <div className="p-3 rounded-lg bg-primary/10">
+                <BarChart3 className="w-6 h-6 text-primary" data-testid="icon-analytics" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-1" data-testid="text-analytics-title">
+                  Analítica
+                </h3>
+                <p className="text-sm text-muted-foreground" data-testid="text-analytics-description">
+                  Visualiza métricas y tendencias de rendimiento de tus campañas
+                </p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+
+        <Card 
+          className="p-6 hover-elevate cursor-pointer h-full" 
+          onClick={() => setInviteMembersOpen(true)}
+          data-testid="card-invite-members"
+        >
+          <div className="flex flex-col items-start gap-3">
+            <div className="p-3 rounded-lg bg-primary/10">
+              <UserPlus className="w-6 h-6 text-primary" data-testid="icon-invite" />
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1" data-testid="text-invite-title">
+                Invita otros miembros
+              </h3>
+              <p className="text-sm text-muted-foreground" data-testid="text-invite-description">
+                Colabora con tu equipo invitando miembros a tu workspace
+              </p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="space-y-4">
@@ -270,6 +309,50 @@ export default function Overview() {
           </Card>
         )}
       </div>
+
+      <Dialog open={inviteMembersOpen} onOpenChange={setInviteMembersOpen}>
+        <DialogContent data-testid="dialog-invite-members">
+          <DialogHeader>
+            <DialogTitle>Invitar miembros al equipo</DialogTitle>
+            <DialogDescription>
+              Invita a tu equipo para colaborar en el análisis de creatividades
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email del miembro</label>
+              <Input 
+                type="email" 
+                placeholder="correo@ejemplo.com" 
+                data-testid="input-member-email"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setInviteMembersOpen(false)}
+                data-testid="button-cancel-invite"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="button"
+                onClick={() => {
+                  toast({
+                    title: "Invitación enviada",
+                    description: "Se ha enviado la invitación al miembro",
+                  });
+                  setInviteMembersOpen(false);
+                }}
+                data-testid="button-send-invite"
+              >
+                Enviar invitación
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
