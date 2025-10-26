@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, timestamp, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -42,7 +42,7 @@ export const folders = pgTable("folders", {
 
 export const recentReports = pgTable("recent_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  reportId: varchar("report_id").notNull(),
+  reportId: varchar("report_id").notNull().unique(),
   reportName: text("report_name").notNull(),
   lastOpenedAt: timestamp("last_opened_at").notNull().defaultNow(),
 });
