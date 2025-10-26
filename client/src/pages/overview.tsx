@@ -74,6 +74,39 @@ export default function Overview() {
     createFolderMutation.mutate(data);
   };
 
+  const moveReportMutation = useMutation({
+    mutationFn: async ({ reportId, newFolderId }: { reportId: string; newFolderId: string | null }) => {
+      return await apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId: newFolderId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      toast({
+        title: "Reporte movido",
+        description: "El reporte se ha movido a la carpeta",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo mover el reporte",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, folderId: string) => {
+    e.preventDefault();
+    const reportId = e.dataTransfer.getData("reportId");
+    if (reportId) {
+      moveReportMutation.mutate({ reportId, newFolderId: folderId });
+    }
+  };
+
   return (
     <div className="p-6 space-y-8">
       <div>
@@ -176,16 +209,23 @@ export default function Overview() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {folders.map((folder) => (
-              <Link key={folder.id} href={`/folder/${folder.id}`} data-testid={`link-folder-${folder.id}`}>
-                <Card className="p-4 hover-elevate cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <FolderIcon className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium" data-testid={`text-folder-name-${folder.id}`}>
-                      {folder.name}
-                    </span>
-                  </div>
-                </Card>
-              </Link>
+              <div
+                key={folder.id}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, folder.id)}
+                data-testid={`drop-zone-folder-${folder.id}`}
+              >
+                <Link href={`/folder/${folder.id}`} data-testid={`link-folder-${folder.id}`}>
+                  <Card className="p-4 hover-elevate cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <FolderIcon className="w-5 h-5 text-muted-foreground" />
+                      <span className="font-medium" data-testid={`text-folder-name-${folder.id}`}>
+                        {folder.name}
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              </div>
             ))}
           </div>
         )}

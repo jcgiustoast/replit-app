@@ -1,13 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { FolderIcon, Loader2, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Folder, SavedReport } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function FolderDetail() {
   const [, params] = useRoute("/folder/:id");
   const folderId = params?.id;
+  const { toast } = useToast();
 
   const { data: folder, isLoading: folderLoading, isError } = useQuery<Folder>({
     queryKey: ["/api/folders", folderId],
@@ -27,6 +30,44 @@ export default function FolderDetail() {
   const folderReports = allReports.filter(
     (report) => report.folderId === folderId
   );
+
+  const moveReportMutation = useMutation({
+    mutationFn: async ({ reportId, newFolderId }: { reportId: string; newFolderId: string | null }) => {
+      return await apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId: newFolderId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      toast({
+        title: "Reporte movido",
+        description: "El reporte se ha movido exitosamente",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo mover el reporte",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDragStart = (e: React.DragEvent, reportId: string) => {
+    e.dataTransfer.setData("reportId", reportId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const reportId = e.dataTransfer.getData("reportId");
+    if (reportId && folderId) {
+      moveReportMutation.mutate({ reportId, newFolderId: folderId });
+    }
+  };
 
   if (folderLoading) {
     return (
@@ -98,20 +139,31 @@ export default function FolderDetail() {
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           {folderReports.map((report) => (
-            <Link key={report.id} href={`/report/${report.id}`} data-testid={`link-report-${report.id}`}>
-              <Card className="p-4 hover-elevate cursor-pointer">
-                <h3 className="font-semibold mb-1" data-testid={`text-report-name-${report.id}`}>
-                  {report.name}
-                </h3>
-                {report.description && (
-                  <p className="text-sm text-muted-foreground" data-testid={`text-report-desc-${report.id}`}>
-                    {report.description}
-                  </p>
-                )}
-              </Card>
-            </Link>
+            <div
+              key={report.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, report.id)}
+              data-testid={`draggable-report-${report.id}`}
+            >
+              <Link href={`/report/${report.id}`} data-testid={`link-report-${report.id}`}>
+                <Card className="p-4 hover-elevate cursor-move">
+                  <h3 className="font-semibold mb-1" data-testid={`text-report-name-${report.id}`}>
+                    {report.name}
+                  </h3>
+                  {report.description && (
+                    <p className="text-sm text-muted-foreground" data-testid={`text-report-desc-${report.id}`}>
+                      {report.description}
+                    </p>
+                  )}
+                </Card>
+              </Link>
+            </div>
           ))}
         </div>
       )}
