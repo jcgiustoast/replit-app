@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRoute, Link, useLocation } from "wouter";
-import { FolderIcon, Loader2, ArrowLeft, Trash2 } from "lucide-react";
+import { FolderIcon, Loader2, ArrowLeft, Trash2, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Folder, SavedReport } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +33,8 @@ export default function FolderDetail() {
   const folderId = params?.id;
   const { toast } = useToast();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addReportsDialogOpen, setAddReportsDialogOpen] = useState(false);
+  const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
 
   const { data: folder, isLoading: folderLoading, isError } = useQuery<Folder>({
     queryKey: ["/api/folders", folderId],
@@ -45,13 +56,16 @@ export default function FolderDetail() {
     (report) => report.folderId === folderId
   );
 
+  const availableReports = allReports.filter(
+    (report) => report.folderId !== folderId
+  );
+
   const moveReportMutation = useMutation({
     mutationFn: async ({ reportId, newFolderId }: { reportId: string; newFolderId: string | null }) => {
       return await apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId: newFolderId });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/saved-reports"] });
       toast({
         title: "Reporte movido",
         description: "El reporte se ha movido exitosamente",
@@ -91,6 +105,46 @@ export default function FolderDetail() {
     if (folderId) {
       deleteFolderMutation.mutate(folderId);
     }
+  };
+
+  const addReportsMutation = useMutation({
+    mutationFn: async (reportIds: string[]) => {
+      return await Promise.all(
+        reportIds.map((reportId) =>
+          apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId })
+        )
+      );
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      toast({
+        title: "Reportes agregados",
+        description: `${selectedReportIds.length} ${selectedReportIds.length === 1 ? 'reporte agregado' : 'reportes agregados'} a la carpeta`,
+      });
+      setSelectedReportIds([]);
+      setAddReportsDialogOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudieron agregar los reportes",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAddReports = () => {
+    if (selectedReportIds.length > 0) {
+      addReportsMutation.mutate(selectedReportIds);
+    }
+  };
+
+  const toggleReportSelection = (reportId: string) => {
+    setSelectedReportIds((prev) =>
+      prev.includes(reportId)
+        ? prev.filter((id) => id !== reportId)
+        : [...prev, reportId]
+    );
   };
 
   const handleDragStart = (e: React.DragEvent, reportId: string) => {
@@ -163,14 +217,24 @@ export default function FolderDetail() {
             </div>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setDeleteDialogOpen(true)}
-          data-testid="button-delete-folder"
-        >
-          <Trash2 className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setAddReportsDialogOpen(true)}
+            data-testid="button-add-reports"
+          >
+            <Plus className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDeleteDialogOpen(true)}
+            data-testid="button-delete-folder"
+          >
+            <Trash2 className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
 
       {folderReports.length === 0 ? (
@@ -219,6 +283,87 @@ export default function FolderDetail() {
           ))}
         </div>
       )}
+
+      <Dialog 
+        open={addReportsDialogOpen} 
+        onOpenChange={(open) => {
+          setAddReportsDialogOpen(open);
+          if (!open) {
+            setSelectedReportIds([]);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Agregar reportes a la carpeta</DialogTitle>
+            <DialogDescription>
+              Selecciona los reportes que deseas agregar a "{folder.name}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-2 py-4">
+            {availableReports.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8" data-testid="text-no-available-reports">
+                No hay reportes disponibles para agregar
+              </p>
+            ) : (
+              availableReports.map((report) => (
+                <div
+                  key={report.id}
+                  className="flex items-start gap-3 p-3 rounded-lg border hover-elevate"
+                  data-testid={`report-item-${report.id}`}
+                >
+                  <Checkbox
+                    checked={selectedReportIds.includes(report.id)}
+                    onCheckedChange={() => toggleReportSelection(report.id)}
+                    data-testid={`checkbox-report-${report.id}`}
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm" data-testid={`text-available-report-name-${report.id}`}>
+                      {report.name}
+                    </h4>
+                    {report.description && (
+                      <p className="text-sm text-muted-foreground" data-testid={`text-available-report-desc-${report.id}`}>
+                        {report.description}
+                      </p>
+                    )}
+                    {report.folderId && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        En otra carpeta
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAddReportsDialogOpen(false);
+                setSelectedReportIds([]);
+              }}
+              data-testid="button-cancel-add-reports"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleAddReports}
+              disabled={selectedReportIds.length === 0 || addReportsMutation.isPending}
+              data-testid="button-confirm-add-reports"
+            >
+              {addReportsMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Agregando...
+                </>
+              ) : (
+                `Agregar ${selectedReportIds.length > 0 ? `(${selectedReportIds.length})` : ''}`
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
