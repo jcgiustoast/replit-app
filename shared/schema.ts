@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, timestamp, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, timestamp, unique, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -29,7 +29,7 @@ export const savedReports = pgTable("saved_reports", {
   name: text("name").notNull(),
   description: text("description"),
   metrics: text("metrics").notNull().array(),
-  filters: text("filters"),
+  filters: jsonb("filters"),
   folderId: varchar("folder_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

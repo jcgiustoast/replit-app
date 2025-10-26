@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -43,6 +43,10 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
   const [customDateTo, setCustomDateTo] = useState<Date>();
   const [showCustomDate, setShowCustomDate] = useState(false);
   const [filters, setFilters] = useState<AdvancedFilter[]>(initialFilters);
+
+  useEffect(() => {
+    setFilters(initialFilters);
+  }, [initialFilters]);
 
   const handleDateRangeChange = (value: string) => {
     setDateRange(value);

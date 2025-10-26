@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { InsertSavedReport } from "@shared/schema";
+import type { AdvancedFilter } from "./advanced-filters";
 
 const saveReportFormSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
@@ -38,9 +39,10 @@ interface SaveReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   metrics: string[];
+  filters?: AdvancedFilter[];
 }
 
-export function SaveReportDialog({ open, onOpenChange, metrics }: SaveReportDialogProps) {
+export function SaveReportDialog({ open, onOpenChange, metrics, filters = [] }: SaveReportDialogProps) {
   const { toast } = useToast();
   const form = useForm<SaveReportFormData>({
     resolver: zodResolver(saveReportFormSchema),
@@ -77,6 +79,7 @@ export function SaveReportDialog({ open, onOpenChange, metrics }: SaveReportDial
       name: data.name,
       description: data.description || null,
       metrics,
+      filters: filters.length > 0 ? filters : null,
     };
     saveMutation.mutate(reportData);
   };

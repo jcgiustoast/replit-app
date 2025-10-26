@@ -200,13 +200,8 @@ export default function SavedReportPage() {
   const selectedMetrics = report?.metrics ?? [];
 
   useEffect(() => {
-    if (report?.filters) {
-      try {
-        const parsedFilters = JSON.parse(report.filters);
-        setAdvancedFilters(parsedFilters);
-      } catch (e) {
-        console.error('Failed to parse filters:', e);
-      }
+    if (report?.filters && Array.isArray(report.filters)) {
+      setAdvancedFilters(report.filters);
     }
   }, [report]);
 

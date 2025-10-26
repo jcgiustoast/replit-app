@@ -214,6 +214,7 @@ export default function Dashboard() {
               onBreakdownChange={(breakdown) => console.log('Breakdown:', breakdown)}
               onMetricsChange={handleMetricsChange}
               onFiltersChange={handleFiltersChange}
+              initialFilters={advancedFilters}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -257,6 +258,7 @@ export default function Dashboard() {
         open={saveDialogOpen}
         onOpenChange={setSaveDialogOpen}
         metrics={selectedMetrics}
+        filters={advancedFilters}
       />
     </div>
   );

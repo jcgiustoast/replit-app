@@ -14,6 +14,11 @@ The application is inspired by MotionApp's clean design principles and HexClad's
 - Quick access to saved reports from the sidebar navigation
 - Each saved report preserves the selected metrics for consistent analysis
 - Dedicated saved report pages showing the configured view
+- Advanced filters support for granular data filtering:
+  - Text filters (is/contains/is not) for campaigns, ad sets, offers, ángulo
+  - Numeric comparisons (=/>/</>=/<=) for metrics
+  - Funnel stage selection (TOFU/MOFU/BOFU)
+  - Filters persist with saved reports as JSONB in the database
 
 **Dark/Light Mode Toggle**
 - Theme toggle button in the top-right corner of the header
@@ -98,7 +103,14 @@ Preferred communication style: Simple, everyday language.
   - `name`: Report name (required)
   - `description`: Optional description shown in tooltips
   - `metrics`: Array of selected metric names
+  - `filters`: JSONB column storing advanced filter configurations
   - `createdAt`: Timestamp of report creation
+- `recent_reports` table: Tracks recently viewed reports with relative timestamps
+  - `id`: Serial primary key
+  - `reportId`: UUID reference to saved_reports
+  - `viewedAt`: Timestamp of last view
+  - Unique constraint on reportId to prevent duplicates
+  - SQL expressions for atomic updates using RETURNING clause
 - UUID primary keys using `gen_random_uuid()`
 - Timestamp tracking for records
 
