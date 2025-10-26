@@ -105,6 +105,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete a folder
+  app.delete("/api/folders/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteFolder(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Folder not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete folder" });
+    }
+  });
+
   // Get recent reports
   app.get("/api/recent-reports", async (req, res) => {
     try {

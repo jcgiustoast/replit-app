@@ -18,6 +18,7 @@ export interface IStorage {
   getFolders(): Promise<Folder[]>;
   getFolder(id: string): Promise<Folder | undefined>;
   createFolder(folder: InsertFolder): Promise<Folder>;
+  deleteFolder(id: string): Promise<boolean>;
   
   getRecentReports(): Promise<RecentReport[]>;
   addRecentReport(report: InsertRecentReport): Promise<RecentReport>;
@@ -219,6 +220,10 @@ export class MemStorage implements IStorage {
     };
     this.folders.set(id, folder);
     return folder;
+  }
+
+  async deleteFolder(id: string): Promise<boolean> {
+    return this.folders.delete(id);
   }
 
   async getRecentReports(): Promise<RecentReport[]> {

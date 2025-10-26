@@ -78,8 +78,9 @@ export default function Overview() {
     mutationFn: async ({ reportId, newFolderId }: { reportId: string; newFolderId: string | null }) => {
       return await apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId: newFolderId });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/saved-reports"] });
       toast({
         title: "Reporte movido",
         description: "El reporte se ha movido a la carpeta",

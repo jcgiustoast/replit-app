@@ -25,6 +25,7 @@ export default function FolderDetail() {
 
   const { data: allReports = [] } = useQuery<SavedReport[]>({
     queryKey: ["/api/saved-reports"],
+    refetchOnMount: "always",
   });
 
   const folderReports = allReports.filter(
@@ -35,8 +36,9 @@ export default function FolderDetail() {
     mutationFn: async ({ reportId, newFolderId }: { reportId: string; newFolderId: string | null }) => {
       return await apiRequest("PATCH", `/api/saved-reports/${reportId}`, { folderId: newFolderId });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/saved-reports"] });
       toast({
         title: "Reporte movido",
         description: "El reporte se ha movido exitosamente",
