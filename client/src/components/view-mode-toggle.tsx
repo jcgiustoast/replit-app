@@ -12,15 +12,6 @@ export function ViewModeToggle({ value, onChange }: ViewModeToggleProps) {
   return (
     <div className="flex items-center gap-1 border rounded-lg p-1">
       <Button
-        variant={value === "grid" ? "secondary" : "ghost"}
-        size="icon"
-        onClick={() => onChange("grid")}
-        className="h-8 w-8"
-        data-testid="button-view-grid"
-      >
-        <LayoutGrid className="w-4 h-4" />
-      </Button>
-      <Button
         variant={value === "bar" ? "secondary" : "ghost"}
         size="icon"
         onClick={() => onChange("bar")}
@@ -37,6 +28,15 @@ export function ViewModeToggle({ value, onChange }: ViewModeToggleProps) {
         data-testid="button-view-line"
       >
         <LineChart className="w-4 h-4" />
+      </Button>
+      <Button
+        variant={value === "grid" ? "secondary" : "ghost"}
+        size="icon"
+        onClick={() => onChange("grid")}
+        className="h-8 w-8"
+        data-testid="button-view-grid"
+      >
+        <LayoutGrid className="w-4 h-4" />
       </Button>
     </div>
   );

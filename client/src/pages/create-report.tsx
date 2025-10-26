@@ -162,7 +162,7 @@ const MOCK_CREATIVES: Creative[] = [
 ];
 
 export default function Dashboard() {
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("bar");
   const [selectedMetrics, setSelectedMetrics] = useState(["spend", "roas", "cpa", "convertScore"]);
   const [sortBy, setSortBy] = useState<keyof Creative>("spend");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);

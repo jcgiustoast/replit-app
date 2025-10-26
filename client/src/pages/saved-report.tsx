@@ -192,7 +192,7 @@ export default function SavedReportPage() {
     }
   }, [report, reportId]);
 
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("bar");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
 
   const selectedMetrics = report?.metrics ?? [];
