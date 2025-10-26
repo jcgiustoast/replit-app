@@ -29,77 +29,6 @@ const METRIC_LABELS: Record<string, string> = {
 const LEFT_AXIS_METRICS = ["spend", "cpa"];
 const RIGHT_AXIS_METRICS = ["roas", "ctr", "frequency", "convertScore"];
 
-interface CustomTickProps {
-  x?: number;
-  y?: number;
-  payload?: {
-    value: string;
-    index: number;
-  };
-  creativeData?: Array<{ thumbnail: string; adName: string }>;
-}
-
-const CustomXAxisTick = ({ x = 0, y = 0, payload, creativeData }: CustomTickProps) => {
-  if (!payload || !creativeData) return null;
-  
-  const creative = creativeData[payload.index];
-  if (!creative) return null;
-
-  const shortName = creative.adName.length > 20 
-    ? creative.adName.substring(0, 20) + '...' 
-    : creative.adName;
-
-  const imageSize = 70;
-  const imageX = (x || 0) - imageSize / 2;
-  const imageY = (y || 0);
-
-  return (
-    <g>
-      {/* Border rectangle */}
-      <rect
-        x={imageX - 2}
-        y={imageY - 2}
-        width={imageSize + 4}
-        height={imageSize + 4}
-        rx={8}
-        fill="none"
-        stroke="hsl(var(--border))"
-        strokeWidth={2}
-      />
-      {/* Clip path for rounded corners */}
-      <defs>
-        <clipPath id={`clip-${payload.index}`}>
-          <rect x={imageX} y={imageY} width={imageSize} height={imageSize} rx={6} />
-        </clipPath>
-      </defs>
-      {/* Image */}
-      <image
-        href={creative.thumbnail}
-        x={imageX}
-        y={imageY}
-        width={imageSize}
-        height={imageSize}
-        clipPath={`url(#clip-${payload.index})`}
-        preserveAspectRatio="xMidYMid slice"
-      />
-      {/* Text label */}
-      <text
-        x={x || 0}
-        y={imageY + imageSize + 10}
-        textAnchor="middle"
-        fontSize={11}
-        fill="hsl(var(--muted-foreground))"
-      >
-        {shortName.split(' ').map((word, i) => (
-          <tspan key={i} x={x || 0} dy={i === 0 ? 0 : 12}>
-            {word}
-          </tspan>
-        ))}
-      </text>
-    </g>
-  );
-};
-
 export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
   const limitedCreatives = creatives.slice(0, 6);
   
@@ -111,11 +40,6 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
     ctr: creative.ctr,
     frequency: creative.frequency,
     convertScore: creative.convertScore,
-  }));
-
-  const creativeData = limitedCreatives.map(c => ({
-    thumbnail: c.thumbnail,
-    adName: c.adName
   }));
 
   const leftAxisMetrics = metrics.filter(m => LEFT_AXIS_METRICS.includes(m));
@@ -152,12 +76,11 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
     <Card className="px-4 pt-4 pb-0">
       <ResponsiveContainer width="100%" height={870}>
         {mode === "bar" ? (
-          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 0, top: 20, left: 10, right: 10 }}>
+          <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 80, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={false}
-              height={0}
+              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
@@ -203,12 +126,11 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
             ))}
           </BarChart>
         ) : (
-          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 0, top: 20, left: 10, right: 10 }}>
+          <LineChart data={data} data-testid="chart-line" margin={{ bottom: 80, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis 
               dataKey="name" 
-              tick={false}
-              height={0}
+              tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
               interval={0}
             />
             {leftAxisMetrics.length > 0 && (
