@@ -1,16 +1,29 @@
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useRoute, Link } from "wouter";
-import { FolderIcon, Loader2, ArrowLeft } from "lucide-react";
+import { useRoute, Link, useLocation } from "wouter";
+import { FolderIcon, Loader2, ArrowLeft, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { Folder, SavedReport } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 export default function FolderDetail() {
   const [, params] = useRoute("/folder/:id");
+  const [, setLocation] = useLocation();
   const folderId = params?.id;
   const { toast } = useToast();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { data: folder, isLoading: folderLoading, isError } = useQuery<Folder>({
     queryKey: ["/api/folders", folderId],
@@ -52,6 +65,33 @@ export default function FolderDetail() {
       });
     },
   });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: async (folderId: string) => {
+      return await apiRequest("DELETE", `/api/folders/${folderId}`, undefined);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/folders"] });
+      toast({
+        title: "Carpeta eliminada",
+        description: "La carpeta se ha eliminado exitosamente",
+      });
+      setLocation("/");
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la carpeta",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteFolder = () => {
+    if (folderId) {
+      deleteFolderMutation.mutate(folderId);
+    }
+  };
 
   const handleDragStart = (e: React.DragEvent, reportId: string) => {
     e.dataTransfer.setData("reportId", reportId);
@@ -102,25 +142,35 @@ export default function FolderDetail() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/">
-          <Button variant="ghost" size="icon" data-testid="button-back">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-lg bg-primary/10">
-            <FolderIcon className="w-6 h-6 text-primary" data-testid="icon-folder" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold" data-testid="text-folder-name">
-              {folder.name}
-            </h1>
-            <p className="text-sm text-muted-foreground" data-testid="text-folder-count">
-              {folderReports.length} {folderReports.length === 1 ? 'reporte' : 'reportes'}
-            </p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <Button variant="ghost" size="icon" data-testid="button-back">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-lg bg-primary/10">
+              <FolderIcon className="w-6 h-6 text-primary" data-testid="icon-folder" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold" data-testid="text-folder-name">
+                {folder.name}
+              </h1>
+              <p className="text-sm text-muted-foreground" data-testid="text-folder-count">
+                {folderReports.length} {folderReports.length === 1 ? 'reporte' : 'reportes'}
+              </p>
+            </div>
           </div>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setDeleteDialogOpen(true)}
+          data-testid="button-delete-folder"
+        >
+          <Trash2 className="w-5 h-5" />
+        </Button>
       </div>
 
       {folderReports.length === 0 ? (
@@ -169,6 +219,27 @@ export default function FolderDetail() {
           ))}
         </div>
       )}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar carpeta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción eliminará la carpeta "{folder.name}". Los reportes dentro de esta carpeta no se eliminarán, solo quedarán sin carpeta asignada.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteFolder}
+              data-testid="button-confirm-delete"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
