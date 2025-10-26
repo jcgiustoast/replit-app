@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertFolderSchema, type InsertFolder } from "@shared/schema";
 import type { Folder, RecentReport } from "@shared/schema";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   Dialog,
   DialogContent,
@@ -256,10 +258,9 @@ export default function Overview() {
                       {report.reportName}
                     </span>
                     <span className="text-sm text-muted-foreground" data-testid={`text-report-date-${report.id}`}>
-                      {new Date(report.lastOpenedAt).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
+                      {formatDistanceToNow(new Date(report.lastOpenedAt), { 
+                        addSuffix: true, 
+                        locale: es 
                       })}
                     </span>
                   </div>
