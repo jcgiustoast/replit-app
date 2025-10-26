@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { Star, Loader2 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 import { CreativeCard } from "@/components/creative-card";
 import { FilterBar } from "@/components/filter-bar";
 import { ViewModeToggle, type ViewMode } from "@/components/view-mode-toggle";
@@ -175,6 +176,21 @@ export default function SavedReportPage() {
     },
     enabled: !!reportId,
   });
+
+  const addToRecentMutation = useMutation({
+    mutationFn: async (data: { reportId: string; reportName: string }) => {
+      return await apiRequest("POST", "/api/recent-reports", data);
+    },
+  });
+
+  useEffect(() => {
+    if (report && reportId) {
+      addToRecentMutation.mutate({
+        reportId: reportId,
+        reportName: report.name,
+      });
+    }
+  }, [report, reportId]);
 
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);

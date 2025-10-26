@@ -29,7 +29,22 @@ export const savedReports = pgTable("saved_reports", {
   name: text("name").notNull(),
   description: text("description"),
   metrics: text("metrics").notNull().array(),
+  folderId: varchar("folder_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const folders = pgTable("folders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  icon: text("icon"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const recentReports = pgTable("recent_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull(),
+  reportName: text("report_name").notNull(),
+  lastOpenedAt: timestamp("last_opened_at").notNull().defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -47,9 +62,23 @@ export const insertSavedReportSchema = createInsertSchema(savedReports).omit({
   createdAt: true,
 });
 
+export const insertFolderSchema = createInsertSchema(folders).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRecentReportSchema = createInsertSchema(recentReports).omit({
+  id: true,
+  lastOpenedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Creative = typeof creatives.$inferSelect;
 export type InsertCreative = z.infer<typeof insertCreativeSchema>;
 export type SavedReport = typeof savedReports.$inferSelect;
 export type InsertSavedReport = z.infer<typeof insertSavedReportSchema>;
+export type Folder = typeof folders.$inferSelect;
+export type InsertFolder = z.infer<typeof insertFolderSchema>;
+export type RecentReport = typeof recentReports.$inferSelect;
+export type InsertRecentReport = z.infer<typeof insertRecentReportSchema>;

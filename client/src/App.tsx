@@ -7,16 +7,20 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import Dashboard from "@/pages/dashboard";
+import Overview from "@/pages/overview";
+import CreateReport from "@/pages/create-report";
 import SavedReportPage from "@/pages/saved-report";
+import FolderDetail from "@/pages/folder-detail";
 import NotFound from "@/pages/not-found";
 import { Menu } from "lucide-react";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={Overview} />
+      <Route path="/create-report" component={CreateReport} />
       <Route path="/report/:id" component={SavedReportPage} />
+      <Route path="/folder/:id" component={FolderDetail} />
       <Route path="/explore" component={NotFound} />
       <Route path="/reports" component={NotFound} />
       <Route path="/working" component={NotFound} />

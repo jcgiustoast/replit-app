@@ -20,7 +20,8 @@ import {
 import type { SavedReport } from "@shared/schema";
 
 const menuItems = [
-  { title: "Home", url: "/", icon: Home },
+  { title: "Overview", url: "/", icon: Home },
+  { title: "Create report", url: "/create-report", icon: FileBarChart },
   { title: "Explore Agents", url: "/explore", icon: Users },
   { title: "Reports", url: "/reports", icon: FileText },
 ];
