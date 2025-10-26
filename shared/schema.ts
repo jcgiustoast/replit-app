@@ -29,6 +29,7 @@ export const savedReports = pgTable("saved_reports", {
   name: text("name").notNull(),
   description: text("description"),
   metrics: text("metrics").notNull().array(),
+  filters: text("filters"),
   folderId: varchar("folder_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

@@ -16,11 +16,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { MetricBadge } from "./metric-badge";
+import { AdvancedFilters, type AdvancedFilter } from "./advanced-filters";
 
 interface FilterBarProps {
   onDateRangeChange?: (range: string) => void;
   onBreakdownChange?: (breakdown: string) => void;
   onMetricsChange?: (metrics: string[]) => void;
+  onFiltersChange?: (filters: AdvancedFilter[]) => void;
+  initialFilters?: AdvancedFilter[];
 }
 
 const METRIC_OPTIONS = [
@@ -32,13 +35,14 @@ const METRIC_OPTIONS = [
   { value: "convertScore", label: "Convert score", color: "bg-chart-1", tooltip: "Conversion performance score" },
 ];
 
-export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChange }: FilterBarProps) {
+export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChange, onFiltersChange, initialFilters = [] }: FilterBarProps) {
   const [dateRange, setDateRange] = useState("14");
   const [breakdown, setBreakdown] = useState("adName");
   const [selectedMetrics, setSelectedMetrics] = useState(["spend", "roas", "cpa", "convertScore"]);
   const [customDateFrom, setCustomDateFrom] = useState<Date>();
   const [customDateTo, setCustomDateTo] = useState<Date>();
   const [showCustomDate, setShowCustomDate] = useState(false);
+  const [filters, setFilters] = useState<AdvancedFilter[]>(initialFilters);
 
   const handleDateRangeChange = (value: string) => {
     setDateRange(value);
@@ -70,6 +74,12 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
       onMetricsChange?.(newMetrics);
       console.log('Metric added:', metric);
     }
+  };
+
+  const handleFiltersChange = (newFilters: AdvancedFilter[]) => {
+    setFilters(newFilters);
+    onFiltersChange?.(newFilters);
+    console.log('Filters changed:', newFilters);
   };
 
   const availableMetrics = METRIC_OPTIONS.filter(m => !selectedMetrics.includes(m.value));
@@ -194,6 +204,10 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
             />
           );
         })}
+      </div>
+
+      <div className="pt-2 border-t">
+        <AdvancedFilters filters={filters} onChange={handleFiltersChange} />
       </div>
     </div>
   );
