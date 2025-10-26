@@ -35,6 +35,11 @@ const METRIC_LABELS: Record<string, string> = {
   ctr: "CTR",
   frequency: "Frequency",
   convertScore: "Convert Score",
+  videoViews: "Video Views",
+  impressions: "Impressions",
+  conversions: "Conversions",
+  costPerConversion: "Cost per Conversion",
+  cpm: "CPM",
 };
 
 export function CreativesTable({ creatives, selectedMetrics }: CreativesTableProps) {
@@ -97,10 +102,15 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
     setCurrentPage(1);
   };
 
-  const formatValue = (metric: string, value: number) => {
+  const formatValue = (metric: string, value: number | undefined) => {
+    if (value === undefined || value === null) {
+      return "—";
+    }
     switch (metric) {
       case "spend":
       case "cpa":
+      case "costPerConversion":
+      case "cpm":
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
@@ -113,6 +123,9 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
       case "frequency":
         return value.toFixed(1);
       case "convertScore":
+      case "videoViews":
+      case "impressions":
+      case "conversions":
         return value.toString();
       default:
         return value.toString();

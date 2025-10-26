@@ -58,6 +58,81 @@ export class MemStorage implements IStorage {
     this.folders.set(folder1.id, folder1);
     this.folders.set(folder2.id, folder2);
     this.folders.set(folder3.id, folder3);
+
+    // Seed pre-configured reports
+    // What's Working reports
+    const report1: SavedReport = {
+      id: randomUUID(),
+      name: "Top Creativos",
+      description: "Los creativos con mejor rendimiento general",
+      metrics: ["roas", "ctr", "spend"],
+      folderId: folder1.id,
+      createdAt: new Date(),
+    };
+    
+    const report2: SavedReport = {
+      id: randomUUID(),
+      name: "Top Ángulos",
+      description: "Ángulos de mensaje más efectivos",
+      metrics: ["ctr", "roas", "cpa"],
+      folderId: folder1.id,
+      createdAt: new Date(),
+    };
+    
+    const report3: SavedReport = {
+      id: randomUUID(),
+      name: "Top Click to Purchase Creatives",
+      description: "Creativos con mayor tasa de conversión a compra",
+      metrics: ["cpa", "roas", "spend"],
+      folderId: folder1.id,
+      createdAt: new Date(),
+    };
+
+    // What's Not Working reports
+    const report4: SavedReport = {
+      id: randomUUID(),
+      name: "Creativos Saturados",
+      description: "Creativos con fatiga de audiencia",
+      metrics: ["ctr", "frequency", "cpa"],
+      folderId: folder2.id,
+      createdAt: new Date(),
+    };
+
+    // Launch Analysis reports
+    const report5: SavedReport = {
+      id: randomUUID(),
+      name: "Video Hold Iterations",
+      description: "Análisis de retención de video",
+      metrics: ["ctr", "spend", "frequency"],
+      folderId: folder3.id,
+      createdAt: new Date(),
+    };
+    
+    const report6: SavedReport = {
+      id: randomUUID(),
+      name: "Video Hooks Iterations",
+      description: "Iteraciones de hooks de video",
+      metrics: ["ctr", "convertScore", "roas"],
+      folderId: folder3.id,
+      createdAt: new Date(),
+    };
+    
+    const report7: SavedReport = {
+      id: randomUUID(),
+      name: "Low Hook and High Click to Purchase",
+      description: "Creativos con bajo engagement pero alta conversión",
+      metrics: ["roas", "cpa", "ctr"],
+      folderId: folder3.id,
+      createdAt: new Date(),
+    };
+
+    this.savedReports.set(report1.id, report1);
+    this.savedReports.set(report2.id, report2);
+    this.savedReports.set(report3.id, report3);
+    this.savedReports.set(report4.id, report4);
+    this.savedReports.set(report5.id, report5);
+    this.savedReports.set(report6.id, report6);
+    this.savedReports.set(report7.id, report7);
   }
 
   async getUser(id: string): Promise<User | undefined> {
