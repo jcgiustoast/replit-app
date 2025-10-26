@@ -74,7 +74,7 @@ export function ChartView({ creatives, mode, metrics }: ChartViewProps) {
 
   return (
     <Card className="px-4 pt-4 pb-0">
-      <ResponsiveContainer width="100%" height={870}>
+      <ResponsiveContainer width="100%" height={500}>
         {mode === "bar" ? (
           <BarChart data={data} data-testid="chart-bar" margin={{ bottom: 80, top: 20, left: 10, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
