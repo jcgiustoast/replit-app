@@ -11,6 +11,7 @@ import { CreativesTable } from "@/components/creatives-table";
 import { SaveReportDialog } from "@/components/save-report-dialog";
 import { Button } from "@/components/ui/button";
 import type { Creative, SavedReport } from "@shared/schema";
+import type { AdvancedFilter } from "@/components/advanced-filters";
 
 import panImage from '@assets/generated_images/Black_hybrid_sauté_pan_82f22d3b.png';
 import dutchOvenImage from '@assets/generated_images/Orange_dutch_oven_pot_c05b89f0.png';
@@ -194,8 +195,20 @@ export default function SavedReportPage() {
 
   const [viewMode, setViewMode] = useState<ViewMode>("bar");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
 
   const selectedMetrics = report?.metrics ?? [];
+
+  useEffect(() => {
+    if (report?.filters) {
+      try {
+        const parsedFilters = JSON.parse(report.filters);
+        setAdvancedFilters(parsedFilters);
+      } catch (e) {
+        console.error('Failed to parse filters:', e);
+      }
+    }
+  }, [report]);
 
   const handleSortChange = (metric: string) => {
     const sorted = [...MOCK_CREATIVES].sort((a, b) => {
@@ -207,6 +220,11 @@ export default function SavedReportPage() {
       return 0;
     });
     setSortedCreatives(sorted);
+  };
+
+  const handleFiltersChange = (filters: AdvancedFilter[]) => {
+    setAdvancedFilters(filters);
+    console.log('Advanced filters changed:', filters);
   };
 
   if (isLoading) {
@@ -247,8 +265,18 @@ export default function SavedReportPage() {
           )}
         </div>
 
-        <div className="mb-6 flex items-start justify-end gap-2">
-          <ViewModeToggle value={viewMode} onChange={setViewMode} />
+        <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex-1 min-w-[300px]">
+            <FilterBar
+              onDateRangeChange={(range) => console.log('Date range:', range)}
+              onBreakdownChange={(breakdown) => console.log('Breakdown:', breakdown)}
+              onFiltersChange={handleFiltersChange}
+              initialFilters={advancedFilters}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <ViewModeToggle value={viewMode} onChange={setViewMode} />
+          </div>
         </div>
 
         <div className="mb-8">

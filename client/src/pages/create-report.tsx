@@ -8,6 +8,7 @@ import { CreativesTable } from "@/components/creatives-table";
 import { SaveReportDialog } from "@/components/save-report-dialog";
 import { Button } from "@/components/ui/button";
 import type { Creative } from "@shared/schema";
+import type { AdvancedFilter } from "@/components/advanced-filters";
 
 // TODO: remove mock functionality - this data should come from the API
 import panImage from '@assets/generated_images/Black_hybrid_sauté_pan_82f22d3b.png';
@@ -167,10 +168,16 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState<keyof Creative>("spend");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
 
   const handleMetricsChange = (metrics: string[]) => {
     setSelectedMetrics(metrics);
     console.log('Selected metrics:', metrics);
+  };
+
+  const handleFiltersChange = (filters: AdvancedFilter[]) => {
+    setAdvancedFilters(filters);
+    console.log('Advanced filters changed:', filters);
   };
 
   const handleSortChange = (metric: string) => {
@@ -206,6 +213,7 @@ export default function Dashboard() {
               onDateRangeChange={(range) => console.log('Date range:', range)}
               onBreakdownChange={(breakdown) => console.log('Breakdown:', breakdown)}
               onMetricsChange={handleMetricsChange}
+              onFiltersChange={handleFiltersChange}
             />
           </div>
           <div className="flex items-center gap-2">
