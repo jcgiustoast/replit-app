@@ -1,11 +1,37 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, FolderIcon, Clock } from "lucide-react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertFolderSchema, type InsertFolder } from "@shared/schema";
 import type { Folder, RecentReport } from "@shared/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Overview() {
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const { toast } = useToast();
+
   const { data: folders = [], isLoading: foldersLoading } = useQuery<Folder[]>({
     queryKey: ["/api/folders"],
   });
@@ -13,6 +39,40 @@ export default function Overview() {
   const { data: recentReports = [], isLoading: recentLoading } = useQuery<RecentReport[]>({
     queryKey: ["/api/recent-reports"],
   });
+
+  const form = useForm<InsertFolder>({
+    resolver: zodResolver(insertFolderSchema),
+    defaultValues: {
+      name: "",
+      icon: null,
+    },
+  });
+
+  const createFolderMutation = useMutation({
+    mutationFn: async (data: InsertFolder) => {
+      return await apiRequest("POST", "/api/folders", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/folders"] });
+      setCreateFolderOpen(false);
+      form.reset();
+      toast({
+        title: "Carpeta creada",
+        description: "La carpeta se ha creado exitosamente",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo crear la carpeta",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmitFolder = (data: InsertFolder) => {
+    createFolderMutation.mutate(data);
+  };
 
   return (
     <div className="p-6 space-y-8">
@@ -44,9 +104,65 @@ export default function Overview() {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <FolderIcon className="w-5 h-5" data-testid="icon-folder" />
-          <h2 className="text-2xl font-bold" data-testid="text-folders-title">Folders</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FolderIcon className="w-5 h-5" data-testid="icon-folder" />
+            <h2 className="text-2xl font-bold" data-testid="text-folders-title">Folders</h2>
+          </div>
+          <Dialog open={createFolderOpen} onOpenChange={setCreateFolderOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-folder">
+                <Plus className="w-4 h-4 mr-2" />
+                Nueva carpeta
+              </Button>
+            </DialogTrigger>
+            <DialogContent data-testid="dialog-create-folder">
+              <DialogHeader>
+                <DialogTitle>Crear nueva carpeta</DialogTitle>
+                <DialogDescription>
+                  Crea una carpeta personalizada para organizar tus reportes
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitFolder)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre de la carpeta</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Ej: Análisis de Q4" 
+                            {...field} 
+                            data-testid="input-folder-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setCreateFolderOpen(false)}
+                      data-testid="button-cancel-folder"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      disabled={createFolderMutation.isPending}
+                      data-testid="button-submit-folder"
+                    >
+                      {createFolderMutation.isPending ? "Creando..." : "Crear carpeta"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {foldersLoading ? (
