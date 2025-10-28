@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { SavedReport } from "@shared/schema";
+import type { SavedReport, Folder } from "@shared/schema";
 
 const menuItems = [
   { title: "Overview", url: "/", icon: Home },
@@ -34,11 +34,11 @@ const menuItems = [
   { title: "Analítica", url: "/analitica", icon: LineChart },
 ];
 
-const analysisItems = [
-  { title: "What's Working", url: "/working", icon: TrendingUp },
-  { title: "What's Not Working", url: "/not-working", icon: TrendingDown },
-  { title: "Launch Analysis", url: "/launch", icon: BarChart3 },
-];
+const folderIconMap: Record<string, any> = {
+  "trend-up": TrendingUp,
+  "trend-down": TrendingDown,
+  "bar-chart": BarChart3,
+};
 
 export function AppSidebar() {
   const [location] = useLocation();
@@ -46,6 +46,10 @@ export function AppSidebar() {
   
   const { data: savedReports = [] } = useQuery<SavedReport[]>({
     queryKey: ["/api/saved-reports"],
+  });
+
+  const { data: folders = [] } = useQuery<Folder[]>({
+    queryKey: ["/api/folders"],
   });
 
   const deleteMutation = useMutation({
@@ -98,16 +102,23 @@ export function AppSidebar() {
           <SidebarGroupLabel>Folders</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {analysisItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location === item.url} data-testid={`link-${item.title.toLowerCase().replace(/\s+/g, '-')}`}>
-                    <Link href={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {folders.map((folder) => {
+                const IconComponent = folderIconMap[folder.icon] || FileBarChart;
+                return (
+                  <SidebarMenuItem key={folder.id}>
+                    <SidebarMenuButton 
+                      asChild 
+                      isActive={location === `/folder/${folder.id}`} 
+                      data-testid={`link-folder-${folder.id}`}
+                    >
+                      <Link href={`/folder/${folder.id}`}>
+                        <IconComponent className="w-4 h-4" />
+                        <span>{folder.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
