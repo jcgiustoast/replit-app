@@ -24,6 +24,7 @@ import type { Creative } from "@shared/schema";
 interface CreativesTableProps {
   creatives: Creative[];
   selectedMetrics: string[];
+  onRowClick?: (creative: Creative) => void;
 }
 
 const ITEMS_PER_PAGE = 8;
@@ -42,7 +43,7 @@ const METRIC_LABELS: Record<string, string> = {
   cpm: "CPM",
 };
 
-export function CreativesTable({ creatives, selectedMetrics }: CreativesTableProps) {
+export function CreativesTable({ creatives, selectedMetrics, onRowClick }: CreativesTableProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -185,10 +186,11 @@ export function CreativesTable({ creatives, selectedMetrics }: CreativesTablePro
             {paginatedCreatives.map((creative) => (
               <TableRow
                 key={creative.id}
-                className={selectedIds.has(creative.id) ? "bg-muted/50" : ""}
+                className={`${selectedIds.has(creative.id) ? "bg-muted/50" : ""} ${onRowClick ? "cursor-pointer hover-elevate" : ""}`}
                 data-testid={`row-creative-${creative.id}`}
+                onClick={() => onRowClick?.(creative)}
               >
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={selectedIds.has(creative.id)}
                     onCheckedChange={() => toggleRow(creative.id)}

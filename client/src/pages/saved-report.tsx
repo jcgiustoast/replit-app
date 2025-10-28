@@ -9,6 +9,7 @@ import { ViewModeToggle, type ViewMode } from "@/components/view-mode-toggle";
 import { ChartView } from "@/components/chart-view";
 import { CreativesTable } from "@/components/creatives-table";
 import { SaveReportDialog } from "@/components/save-report-dialog";
+import { CreativeDetailDialog } from "@/components/creative-detail-dialog";
 import { Button } from "@/components/ui/button";
 import type { Creative, SavedReport } from "@shared/schema";
 import type { AdvancedFilter } from "@/components/advanced-filters";
@@ -196,6 +197,8 @@ export default function SavedReportPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("bar");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
+  const [selectedCreative, setSelectedCreative] = useState<Creative | null>(null);
+  const [creativeDetailOpen, setCreativeDetailOpen] = useState(false);
 
   const selectedMetrics = report?.metrics ?? [];
 
@@ -294,9 +297,19 @@ export default function SavedReportPage() {
           <CreativesTable 
             creatives={sortedCreatives} 
             selectedMetrics={selectedMetrics}
+            onRowClick={(creative) => {
+              setSelectedCreative(creative);
+              setCreativeDetailOpen(true);
+            }}
           />
         </div>
       </div>
+
+      <CreativeDetailDialog
+        creative={selectedCreative}
+        open={creativeDetailOpen}
+        onOpenChange={setCreativeDetailOpen}
+      />
     </div>
   );
 }

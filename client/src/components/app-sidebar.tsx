@@ -103,7 +103,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {folders.map((folder) => {
-                const IconComponent = folderIconMap[folder.icon] || FileBarChart;
+                const IconComponent = folder.icon ? folderIconMap[folder.icon] || FileBarChart : FileBarChart;
                 return (
                   <SidebarMenuItem key={folder.id}>
                     <SidebarMenuButton 

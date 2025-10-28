@@ -6,6 +6,7 @@ import { ViewModeToggle, type ViewMode } from "@/components/view-mode-toggle";
 import { ChartView } from "@/components/chart-view";
 import { CreativesTable } from "@/components/creatives-table";
 import { SaveReportDialog } from "@/components/save-report-dialog";
+import { CreativeDetailDialog } from "@/components/creative-detail-dialog";
 import { Button } from "@/components/ui/button";
 import type { Creative } from "@shared/schema";
 import type { AdvancedFilter } from "@/components/advanced-filters";
@@ -168,6 +169,8 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState<keyof Creative>("spend");
   const [sortedCreatives, setSortedCreatives] = useState(MOCK_CREATIVES);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [selectedCreative, setSelectedCreative] = useState<Creative | null>(null);
+  const [creativeDetailOpen, setCreativeDetailOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilter[]>([]);
 
   const handleMetricsChange = (metrics: string[]) => {
@@ -250,9 +253,19 @@ export default function Dashboard() {
           <CreativesTable 
             creatives={sortedCreatives} 
             selectedMetrics={selectedMetrics}
+            onRowClick={(creative) => {
+              setSelectedCreative(creative);
+              setCreativeDetailOpen(true);
+            }}
           />
         </div>
       </div>
+
+      <CreativeDetailDialog
+        creative={selectedCreative}
+        open={creativeDetailOpen}
+        onOpenChange={setCreativeDetailOpen}
+      />
 
       <SaveReportDialog
         open={saveDialogOpen}
