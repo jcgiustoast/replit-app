@@ -281,7 +281,15 @@ export default function SavedReportPage() {
           {viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedCreatives.map((creative) => (
-                <CreativeCard key={creative.id} creative={creative} />
+                <CreativeCard 
+                  key={creative.id} 
+                  creative={creative} 
+                  selectedMetrics={selectedMetrics}
+                  onClick={() => {
+                    setSelectedCreative(creative);
+                    setCreativeDetailOpen(true);
+                  }}
+                />
               ))}
             </div>
           ) : (

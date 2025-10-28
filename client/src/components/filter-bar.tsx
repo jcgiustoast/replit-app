@@ -90,7 +90,8 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
+      {/* Primera fila: Date range, Group by, filtros, Add filter */}
+      <div className="flex flex-wrap items-center gap-3">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2" data-testid="button-date-range">
@@ -168,10 +169,30 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
           </SelectContent>
         </Select>
 
+        {/* Filtros avanzados inline */}
+        <AdvancedFilters filters={filters} onChange={handleFiltersChange} />
+      </div>
+
+      {/* Segunda fila: Métricas seleccionadas + Add metric */}
+      <div className="flex flex-wrap items-center gap-2">
+        {selectedMetrics.map((metricValue) => {
+          const metric = METRIC_OPTIONS.find(m => m.value === metricValue);
+          if (!metric) return null;
+          return (
+            <MetricBadge
+              key={metric.value}
+              label={metric.label}
+              color={metric.color}
+              onRemove={() => handleRemoveMetric(metric.value)}
+              tooltip={metric.tooltip}
+            />
+          );
+        })}
+        
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2" data-testid="button-add-metric">
-              <Plus className="w-4 h-4" />
+            <Button variant="outline" size="sm" className="gap-2 h-7" data-testid="button-add-metric">
+              <Plus className="w-3 h-3" />
               Add metric
             </Button>
           </PopoverTrigger>
@@ -192,26 +213,6 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {selectedMetrics.map((metricValue) => {
-          const metric = METRIC_OPTIONS.find(m => m.value === metricValue);
-          if (!metric) return null;
-          return (
-            <MetricBadge
-              key={metric.value}
-              label={metric.label}
-              color={metric.color}
-              onRemove={() => handleRemoveMetric(metric.value)}
-              tooltip={metric.tooltip}
-            />
-          );
-        })}
-      </div>
-
-      <div className="pt-2 border-t">
-        <AdvancedFilters filters={filters} onChange={handleFiltersChange} />
       </div>
     </div>
   );

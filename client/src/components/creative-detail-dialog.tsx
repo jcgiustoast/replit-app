@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { X, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import type { Creative } from "@shared/schema";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
@@ -60,33 +60,21 @@ export function CreativeDetailDialog({
         ) : (
           <>
             <DialogHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <DialogTitle className="text-xl mb-2" data-testid="text-creative-detail-title">
-                    {creative.adName}
-                  </DialogTitle>
-                  <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                    <span data-testid="text-creative-campaign">
-                      {creative.campaignName}
-                    </span>
-                    <span>•</span>
-                    <span data-testid="text-creative-adset">
-                      {creative.adSetName}
-                    </span>
-                    <span>•</span>
-                    <span data-testid="text-creative-id">
-                      #{creative.id}
-                    </span>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onOpenChange(false)}
-                  data-testid="button-close-dialog"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+              <DialogTitle className="text-xl mb-2" data-testid="text-creative-detail-title">
+                {creative.adName}
+              </DialogTitle>
+              <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                <span data-testid="text-creative-campaign">
+                  {creative.campaignName}
+                </span>
+                <span>•</span>
+                <span data-testid="text-creative-adset">
+                  {creative.adSetName}
+                </span>
+                <span>•</span>
+                <span data-testid="text-creative-id">
+                  #{creative.id}
+                </span>
               </div>
             </DialogHeader>
 
