@@ -1,6 +1,6 @@
-import { Home, TrendingUp, TrendingDown, BarChart3, Settings, FileBarChart, LineChart } from "lucide-react";
+import { Home, TrendingUp, TrendingDown, BarChart3, Settings, FileBarChart, LineChart, MoreVertical, Trash2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { SavedReport } from "@shared/schema";
 
 const menuItems = [
@@ -33,9 +42,30 @@ const analysisItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
+  const { toast } = useToast();
   
   const { data: savedReports = [] } = useQuery<SavedReport[]>({
     queryKey: ["/api/saved-reports"],
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (reportId: string) => {
+      await apiRequest("DELETE", `/api/saved-reports/${reportId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/saved-reports"] });
+      toast({
+        title: "Reporte eliminado",
+        description: "El reporte se ha eliminado correctamente",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el reporte",
+        variant: "destructive",
+      });
+    },
   });
 
   return (
@@ -88,25 +118,54 @@ export function AppSidebar() {
             <SidebarMenu>
               {savedReports.map((report) => (
                 <SidebarMenuItem key={report.id}>
-                  <Tooltip delayDuration={300}>
-                    <TooltipTrigger className="w-full">
-                      <SidebarMenuButton 
-                        asChild 
-                        isActive={location === `/report/${report.id}`}
-                        data-testid={`link-saved-report-${report.id}`}
-                      >
-                        <Link href={`/report/${report.id}`}>
-                          <FileBarChart className="w-4 h-4" />
-                          <span>{report.name}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    {report.description && (
-                      <TooltipContent side="right" className="max-w-xs">
-                        <p>{report.description}</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
+                  <div className="flex items-center gap-1 w-full group">
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger className="flex-1 min-w-0">
+                        <SidebarMenuButton 
+                          asChild 
+                          isActive={location === `/report/${report.id}`}
+                          data-testid={`link-saved-report-${report.id}`}
+                          className="w-full"
+                        >
+                          <Link href={`/report/${report.id}`}>
+                            <FileBarChart className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{report.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      {report.description && (
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p>{report.description}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                          data-testid={`button-report-menu-${report.id}`}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteMutation.mutate(report.id);
+                          }}
+                          data-testid={`button-delete-report-${report.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
