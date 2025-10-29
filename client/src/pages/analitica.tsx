@@ -2,14 +2,37 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BarChart2, TrendingUp, Target, Zap, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip, CartesianGrid } from "recharts";
+import { useState } from "react";
+import { InsightDetailDialog } from "@/components/insight-detail-dialog";
 
 export default function AnalyticsPage() {
-  // Mock data for creative formats
+  const [selectedInsight, setSelectedInsight] = useState<any>(null);
+  const [isInsightDialogOpen, setIsInsightDialogOpen] = useState(false);
+
+  // Mock data for creative formats (gasto y facturación en USD)
   const formatData = [
-    { name: "BANNER", value: 54.0, count: 24 },
-    { name: "VIDEO", value: 45.9, count: 20 },
-    { name: "CARROUSEL", value: 0.1, count: 1 },
+    { name: "BANNER", gasto: 2500000, facturacion: 6750000, count: 24 },
+    { name: "VIDEO", gasto: 2100000, facturacion: 7350000, count: 20 },
+    { name: "CARROUSEL", gasto: 5000, facturacion: 17500, count: 1 },
+  ];
+
+  // Mock data for angles
+  const angleData = [
+    { name: "Testimonio", gasto: 1200000, facturacion: 3600000, count: 12 },
+    { name: "Bullet Points", gasto: 980000, facturacion: 2940000, count: 10 },
+    { name: "Podcast", gasto: 750000, facturacion: 2250000, count: 8 },
+    { name: "Demo", gasto: 1100000, facturacion: 3850000, count: 11 },
+    { name: "Lifestyle", gasto: 575000, facturacion: 1725000, count: 4 },
+  ];
+
+  // Mock data for audiences
+  const audienceData = [
+    { name: "Padres", gasto: 1500000, facturacion: 4500000, count: 15 },
+    { name: "Runners", gasto: 980000, facturacion: 3430000, count: 10 },
+    { name: "Crossfiteros", gasto: 850000, facturacion: 2975000, count: 8 },
+    { name: "YogaFun", gasto: 720000, facturacion: 2520000, count: 7 },
+    { name: "Chefs", gasto: 555000, facturacion: 1942000, count: 5 },
   ];
 
   // Mock data for funnel stages
@@ -92,20 +115,94 @@ export default function AnalyticsPage() {
     }
   };
 
-  return (
-    <div className="h-full overflow-y-auto">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <BarChart2 className="w-5 h-5 text-chart-1" />
-            <h1 className="text-2xl font-semibold" data-testid="text-page-title">Analítica</h1>
-          </div>
-          <p className="text-sm text-muted-foreground" data-testid="text-page-description">
-            Análisis profundo del rendimiento de tu cuenta publicitaria
-          </p>
-        </div>
+  const handleInsightClick = (insight: any) => {
+    setSelectedInsight(insight);
+    setIsInsightDialogOpen(true);
+  };
 
-        {/* Key Metrics Cards */}
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <>
+      <div className="h-full overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart2 className="w-5 h-5 text-chart-1" />
+              <h1 className="text-2xl font-semibold" data-testid="text-page-title">Analítica</h1>
+            </div>
+            <p className="text-sm text-muted-foreground" data-testid="text-page-description">
+              Análisis profundo del rendimiento de tu cuenta publicitaria
+            </p>
+          </div>
+
+          {/* Account Health Score - MOVED TO TOP */}
+          <Card className="p-6 mb-8">
+            <h3 className="text-lg font-semibold mb-6" data-testid="text-health-title">
+              Salud de la Cuenta
+            </h3>
+            <div className="flex items-center gap-8">
+              <div className="flex-1">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <div className="h-8 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-500 ${
+                            healthScore >= 70 ? 'bg-chart-2' : healthScore >= 40 ? 'bg-chart-4' : 'bg-destructive'
+                          }`}
+                          style={{ width: `${healthScore}%` }}
+                          data-testid="progress-health-score"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-3xl font-bold tabular-nums" data-testid="text-health-score">
+                        {healthScore}
+                      </p>
+                      <p className="text-xs text-muted-foreground">de 100</p>
+                    </div>
+                  </div>
+                  <div className={`flex items-center gap-2 p-4 rounded-lg ${healthStatus.bgColor}`}>
+                    <HealthIcon className={`w-5 h-5 ${healthStatus.color}`} />
+                    <span className={`font-semibold ${healthStatus.color}`} data-testid="text-health-status">
+                      Estado: {healthStatus.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="space-y-3 text-sm">
+                  <h4 className="font-semibold mb-3">Factores evaluados:</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Diversificación de formatos</span>
+                    <Badge variant="secondary">85/100</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Distribución de presupuesto</span>
+                    <Badge variant="secondary">70/100</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Performance promedio</span>
+                    <Badge variant="secondary">78/100</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Longevidad de creativos</span>
+                    <Badge variant="secondary">68/100</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <div className="flex items-center gap-3 mb-3">
@@ -156,151 +253,109 @@ export default function AnalyticsPage() {
           </Card>
         </div>
 
-        {/* Charts Row */}
+        {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Formato de Creativos Chart */}
+          {/* Formato de Creativos Chart - BAR CHART */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-6" data-testid="text-format-title">
-              Gasto y Fracturación
+            <h3 className="text-lg font-semibold mb-4" data-testid="text-format-title">
+              Gasto y Facturación por Formato
             </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={formatData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  paddingAngle={2}
-                  dataKey="value"
-                  label={({ name, value }) => `${name} ${value.toFixed(1)}%`}
-                >
-                  {formatData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
+              <BarChart data={formatData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="name" className="text-xs" />
+                <YAxis 
+                  className="text-xs"
+                  tickFormatter={(value) => formatCurrency(value)}
+                />
+                <Tooltip 
+                  formatter={(value: number) => formatCurrency(value)}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                />
                 <Legend />
-              </PieChart>
+                <Bar dataKey="gasto" fill="hsl(var(--chart-1))" name="Gasto" />
+                <Bar dataKey="facturacion" fill="hsl(var(--chart-2))" name="Facturación" />
+              </BarChart>
             </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {formatData.map((format, index) => (
-                <div key={format.name} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                    <span>{format.name}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-muted-foreground">{format.count} anuncios</span>
-                    <span className="font-semibold">{format.value.toFixed(1)}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
           </Card>
 
-          {/* Funnel Stages Chart */}
+          {/* Ángulo Chart - BAR CHART */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4" data-testid="text-angle-title">
+              Gasto y Facturación por Ángulo
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={angleData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="name" className="text-xs" angle={-15} textAnchor="end" height={80} />
+                <YAxis 
+                  className="text-xs"
+                  tickFormatter={(value) => formatCurrency(value)}
+                />
+                <Tooltip 
+                  formatter={(value: number) => formatCurrency(value)}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                />
+                <Legend />
+                <Bar dataKey="gasto" fill="hsl(var(--chart-1))" name="Gasto" />
+                <Bar dataKey="facturacion" fill="hsl(var(--chart-2))" name="Facturación" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+
+        {/* Second Row of Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Audiencia Chart - BAR CHART */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4" data-testid="text-audience-title">
+              Gasto y Facturación por Audiencia
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={audienceData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="name" className="text-xs" angle={-15} textAnchor="end" height={80} />
+                <YAxis 
+                  className="text-xs"
+                  tickFormatter={(value) => formatCurrency(value)}
+                />
+                <Tooltip 
+                  formatter={(value: number) => formatCurrency(value)}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                />
+                <Legend />
+                <Bar dataKey="gasto" fill="hsl(var(--chart-1))" name="Gasto" />
+                <Bar dataKey="facturacion" fill="hsl(var(--chart-2))" name="Facturación" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+
+          {/* Funnel Stages Summary */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-6" data-testid="text-funnel-title">
               Distribución por Etapa del Funnel
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={funnelData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  paddingAngle={2}
-                  dataKey="value"
-                  label={({ name, value }) => `${name} ${value}%`}
-                >
-                  {funnelData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value}%`} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {funnelData.map((stage, index) => (
-                <div key={stage.name} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-                    <span>{stage.name}</span>
+            <div className="space-y-4">
+              {funnelData.map((stage) => (
+                <div key={stage.name} className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{stage.name}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-muted-foreground">{stage.count} anuncios</span>
+                      <span className="font-semibold">{stage.value}%</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-muted-foreground">{stage.count} anuncios</span>
-                    <span className="font-semibold">{stage.value}%</span>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-chart-1 transition-all"
+                      style={{ width: `${stage.value}%` }}
+                    />
                   </div>
                 </div>
               ))}
             </div>
           </Card>
         </div>
-
-        {/* Account Health Score */}
-        <Card className="p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-6" data-testid="text-health-title">
-            Salud de la Cuenta
-          </h3>
-          <div className="flex items-center gap-8">
-            <div className="flex-1">
-              {/* Health thermometer visualization */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="h-8 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-500 ${
-                          healthScore >= 70 ? 'bg-chart-2' : healthScore >= 40 ? 'bg-chart-4' : 'bg-destructive'
-                        }`}
-                        style={{ width: `${healthScore}%` }}
-                        data-testid="progress-health-score"
-                      />
-                    </div>                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold tabular-nums" data-testid="text-health-score">
-                      {healthScore}
-                    </p>
-                    <p className="text-xs text-muted-foreground">de 100</p>
-                  </div>
-                </div>
-                <div className={`flex items-center gap-2 p-4 rounded-lg ${healthStatus.bgColor}`}>
-                  <HealthIcon className={`w-5 h-5 ${healthStatus.color}`} />
-                  <span className={`font-semibold ${healthStatus.color}`} data-testid="text-health-status">
-                    Estado: {healthStatus.label}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="space-y-3 text-sm">
-                <h4 className="font-semibold mb-3">Factores evaluados:</h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Diversificación de formatos</span>
-                  <Badge variant="secondary">85/100</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Distribución de presupuesto</span>
-                  <Badge variant="secondary">70/100</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Performance promedio</span>
-                  <Badge variant="secondary">78/100</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Longevidad de creativos</span>
-                  <Badge variant="secondary">68/100</Badge>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
 
         {/* Actionable Insights */}
         <Card className="p-6">
@@ -357,6 +412,7 @@ export default function AnalyticsPage() {
                     variant="ghost"
                     size="sm"
                     className="gap-2"
+                    onClick={() => handleInsightClick(insight)}
                     data-testid={`button-insight-action-${insight.id}`}
                   >
                     Ver detalles
@@ -369,5 +425,14 @@ export default function AnalyticsPage() {
         </Card>
       </div>
     </div>
+
+    {selectedInsight && (
+      <InsightDetailDialog
+        open={isInsightDialogOpen}
+        onOpenChange={setIsInsightDialogOpen}
+        insight={selectedInsight}
+      />
+    )}
+  </>
   );
 }
