@@ -90,8 +90,8 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
 
   return (
     <div className="space-y-4">
-      {/* Primera fila: Date range, Group by, filtros, Add filter */}
-      <div className="flex flex-wrap items-center gap-3">
+      {/* Primera fila: Date range, Group by, filtros aplicados + Add filter button */}
+      <div className="flex flex-wrap items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2" data-testid="button-date-range">
@@ -169,8 +169,8 @@ export function FilterBar({ onDateRangeChange, onBreakdownChange, onMetricsChang
           </SelectContent>
         </Select>
 
-        {/* Filtros avanzados inline */}
-        <AdvancedFilters filters={filters} onChange={handleFiltersChange} />
+        {/* Filtros aplicados como badges inline */}
+        <AdvancedFilters filters={filters} onChange={handleFiltersChange} inline />
       </div>
 
       {/* Segunda fila: Métricas seleccionadas + Add metric */}
