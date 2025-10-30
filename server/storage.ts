@@ -333,30 +333,141 @@ export const storage = new DatabaseStorage();
 
 // Seed initial data
 export async function seedDatabase() {
-  // Check if we already have folders (avoid duplicate seeding)
-  const existingFolders = await storage.getFolders();
-  if (existingFolders.length > 0) {
+  // Check if we already have workspaces (avoid duplicate seeding)
+  const demoUser = await storage.getUserByUsername("demo");
+  let userId = demoUser?.id;
+  
+  if (!userId) {
+    // Create demo user if doesn't exist
+    const user = await storage.createUser({
+      username: "demo",
+      password: "demo123", // In real app, this should be hashed
+    });
+    userId = user.id;
+    
+    // Update user profile
+    await storage.updateUser(userId, {
+      email: "demo@example.com",
+      fullName: "Demo User",
+    });
+  }
+
+  // Check if workspaces already exist
+  const existingWorkspaces = await storage.getWorkspaces(userId);
+  if (existingWorkspaces.length > 0) {
     return; // Already seeded
   }
 
-  // Seed folders
+  // Create workspaces
+  const workspace1 = await storage.createWorkspace({
+    name: "Motion Plus One",
+    icon: "🎬",
+    ownerId: userId,
+  });
+
+  const workspace2 = await storage.createWorkspace({
+    name: "SW",
+    icon: "⚡",
+    ownerId: userId,
+  });
+
+  const workspace3 = await storage.createWorkspace({
+    name: "Test Workspace",
+    icon: "🧪",
+    ownerId: userId,
+  });
+
+  // Add user as owner to all workspaces
+  await storage.addWorkspaceMember({
+    workspaceId: workspace1.id,
+    userId,
+    role: "owner",
+  });
+
+  await storage.addWorkspaceMember({
+    workspaceId: workspace2.id,
+    userId,
+    role: "owner",
+  });
+
+  await storage.addWorkspaceMember({
+    workspaceId: workspace3.id,
+    userId,
+    role: "owner",
+  });
+
+  // Add connections for workspace 1
+  await storage.createConnection({
+    workspaceId: workspace1.id,
+    platform: "meta",
+    accountName: "Motion Plus One - Meta Ads",
+    accountId: "123456789",
+    status: "connected",
+  });
+
+  await storage.createConnection({
+    workspaceId: workspace1.id,
+    platform: "tiktok",
+    accountName: "Motion Plus One - TikTok",
+    accountId: "987654321",
+    status: "connected",
+  });
+
+  // Add nomenclature for workspace 1
+  await storage.createNomenclatureProperty({
+    workspaceId: workspace1.id,
+    platform: "meta",
+    propertyName: "Influencer",
+    separator: "_",
+    order: 1,
+  });
+
+  await storage.createNomenclatureProperty({
+    workspaceId: workspace1.id,
+    platform: "meta",
+    propertyName: "Offer",
+    separator: "_",
+    order: 2,
+  });
+
+  await storage.createNomenclatureProperty({
+    workspaceId: workspace1.id,
+    platform: "meta",
+    propertyName: "Format",
+    separator: "_",
+    order: 3,
+  });
+
+  await storage.createNomenclatureProperty({
+    workspaceId: workspace1.id,
+    platform: "meta",
+    propertyName: "Concept",
+    separator: "_",
+    order: 4,
+  });
+
+  // Seed folders for workspace 1
   const folder1 = await storage.createFolder({
+    workspaceId: workspace1.id,
     name: "What's Working",
     icon: "trend-up",
   });
 
   const folder2 = await storage.createFolder({
+    workspaceId: workspace1.id,
     name: "What's Not Working",
     icon: "trend-down",
   });
 
   const folder3 = await storage.createFolder({
+    workspaceId: workspace1.id,
     name: "Launch Analysis",
     icon: "bar-chart",
   });
 
   // Seed reports for "What's Working"
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Top Creativos",
     description: "Los creativos con mejor rendimiento general",
     metrics: ["roas", "ctr", "spend"],
@@ -364,6 +475,7 @@ export async function seedDatabase() {
   });
 
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Top Ángulos",
     description: "Ángulos de mensaje más efectivos",
     metrics: ["ctr", "roas", "cpa"],
@@ -371,6 +483,7 @@ export async function seedDatabase() {
   });
 
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Top Click to Purchase Creatives",
     description: "Creativos con mayor tasa de conversión a compra",
     metrics: ["cpa", "roas", "spend"],
@@ -379,6 +492,7 @@ export async function seedDatabase() {
 
   // Seed report for "What's Not Working"
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Creativos Saturados",
     description: "Creativos con fatiga de audiencia",
     metrics: ["ctr", "frequency", "cpa"],
@@ -387,6 +501,7 @@ export async function seedDatabase() {
 
   // Seed reports for "Launch Analysis"
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Video Hold Iterations",
     description: "Análisis de retención de video",
     metrics: ["ctr", "spend", "frequency"],
@@ -394,6 +509,7 @@ export async function seedDatabase() {
   });
 
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Video Hooks Iterations",
     description: "Iteraciones de hooks de video",
     metrics: ["ctr", "convertScore", "roas"],
@@ -401,6 +517,7 @@ export async function seedDatabase() {
   });
 
   await storage.createSavedReport({
+    workspaceId: workspace1.id,
     name: "Low Hook and High Click to Purchase",
     description: "Creativos con bajo engagement pero alta conversión",
     metrics: ["roas", "cpa", "ctr"],
