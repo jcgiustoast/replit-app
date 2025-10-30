@@ -361,18 +361,21 @@ export async function seedDatabase() {
   // Create workspaces
   const workspace1 = await storage.createWorkspace({
     name: "Motion Plus One",
+    description: "Workspace para campañas de Motion Plus One",
     icon: "🎬",
     ownerId: userId,
   });
 
   const workspace2 = await storage.createWorkspace({
     name: "SW",
+    description: "Workspace para campañas de SW",
     icon: "⚡",
     ownerId: userId,
   });
 
   const workspace3 = await storage.createWorkspace({
     name: "Test Workspace",
+    description: "Workspace de pruebas",
     icon: "🧪",
     ownerId: userId,
   });
@@ -418,6 +421,7 @@ export async function seedDatabase() {
     workspaceId: workspace1.id,
     platform: "meta",
     propertyName: "Influencer",
+    allowedValues: ["Andrew", "Sophie", "Michael", "Emma", "None"],
     separator: "_",
     order: 1,
   });
@@ -426,6 +430,7 @@ export async function seedDatabase() {
     workspaceId: workspace1.id,
     platform: "meta",
     propertyName: "Offer",
+    allowedValues: ["50OFF", "BOGO", "FreeShip", "Flash20"],
     separator: "_",
     order: 2,
   });
@@ -434,6 +439,7 @@ export async function seedDatabase() {
     workspaceId: workspace1.id,
     platform: "meta",
     propertyName: "Format",
+    allowedValues: ["Video", "Image", "Carousel", "Story"],
     separator: "_",
     order: 3,
   });
@@ -442,6 +448,7 @@ export async function seedDatabase() {
     workspaceId: workspace1.id,
     platform: "meta",
     propertyName: "Concept",
+    allowedValues: ["UGC", "Product", "Lifestyle", "BTS", "Testimonial"],
     separator: "_",
     order: 4,
   });

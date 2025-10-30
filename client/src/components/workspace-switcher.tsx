@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, ChevronsUpDown, Plus, UserPlus, Settings, Camera } from "lucide-react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -25,6 +26,7 @@ interface WorkspaceSwitcherProps {
 export function WorkspaceSwitcher({ onSettingsClick }: WorkspaceSwitcherProps) {
   const [open, setOpen] = useState(false);
   const [currentWorkspaceId, setCurrentWorkspaceId] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
 
   // For now, fetch all workspaces
   // In a real app, this would filter by authenticated user
@@ -56,6 +58,7 @@ export function WorkspaceSwitcher({ onSettingsClick }: WorkspaceSwitcherProps) {
 
   const handleSettings = () => {
     setOpen(false);
+    setLocation("/settings");
     onSettingsClick?.();
   };
 

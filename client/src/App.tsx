@@ -12,6 +12,7 @@ import CreateReport from "@/pages/create-report";
 import SavedReportPage from "@/pages/saved-report";
 import FolderDetail from "@/pages/folder-detail";
 import AnaliticaPage from "@/pages/analitica";
+import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 import { Menu } from "lucide-react";
 
@@ -24,7 +25,7 @@ function Router() {
       <Route path="/report/:id" component={SavedReportPage} />
       <Route path="/folder/:id" component={FolderDetail} />
       <Route path="/launch" component={NotFound} />
-      <Route path="/settings" component={NotFound} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );

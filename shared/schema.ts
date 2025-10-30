@@ -16,6 +16,7 @@ export const users = pgTable("users", {
 export const workspaces = pgTable("workspaces", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
+  description: text("description"),
   icon: text("icon"),
   ownerId: varchar("owner_id").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -29,6 +30,7 @@ export const connections = pgTable("connections", {
   accountId: text("account_id"),
   status: text("status").notNull().default('connected'), // 'connected', 'disconnected', 'error'
   connectedAt: timestamp("connected_at").notNull().defaultNow(),
+  lastSyncAt: timestamp("last_sync_at"),
 });
 
 export const workspaceMembers = pgTable("workspace_members", {
@@ -44,6 +46,7 @@ export const nomenclatureProperties = pgTable("nomenclature_properties", {
   workspaceId: varchar("workspace_id").notNull(),
   platform: text("platform").notNull(), // 'meta', 'tiktok'
   propertyName: text("property_name").notNull(),
+  allowedValues: text("allowed_values").notNull().array(),
   separator: text("separator").default('_'),
   order: integer("order").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
