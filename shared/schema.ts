@@ -7,10 +7,51 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email"),
+  fullName: text("full_name"),
+  avatar: text("avatar"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const workspaces = pgTable("workspaces", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  icon: text("icon"),
+  ownerId: varchar("owner_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const connections = pgTable("connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id").notNull(),
+  platform: text("platform").notNull(), // 'meta', 'tiktok', 'shopify', 'tienda_nube'
+  accountName: text("account_name"),
+  accountId: text("account_id"),
+  status: text("status").notNull().default('connected'), // 'connected', 'disconnected', 'error'
+  connectedAt: timestamp("connected_at").notNull().defaultNow(),
+});
+
+export const workspaceMembers = pgTable("workspace_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  role: text("role").notNull().default('member'), // 'owner', 'admin', 'member', 'viewer'
+  addedAt: timestamp("added_at").notNull().defaultNow(),
+});
+
+export const nomenclatureProperties = pgTable("nomenclature_properties", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id").notNull(),
+  platform: text("platform").notNull(), // 'meta', 'tiktok'
+  propertyName: text("property_name").notNull(),
+  separator: text("separator").default('_'),
+  order: integer("order").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const creatives = pgTable("creatives", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id"),
   adName: text("ad_name").notNull(),
   adSetName: text("ad_set_name").notNull(),
   campaignName: text("campaign_name").notNull(),
@@ -26,6 +67,7 @@ export const creatives = pgTable("creatives", {
 
 export const savedReports = pgTable("saved_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id"),
   name: text("name").notNull(),
   description: text("description"),
   metrics: text("metrics").notNull().array(),
@@ -36,6 +78,7 @@ export const savedReports = pgTable("saved_reports", {
 
 export const folders = pgTable("folders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id"),
   name: text("name").notNull(),
   icon: text("icon"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -43,6 +86,7 @@ export const folders = pgTable("folders", {
 
 export const recentReports = pgTable("recent_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workspaceId: varchar("workspace_id"),
   reportId: varchar("report_id").notNull().unique(),
   reportName: text("report_name").notNull(),
   lastOpenedAt: timestamp("last_opened_at").notNull().defaultNow(),
@@ -51,6 +95,26 @@ export const recentReports = pgTable("recent_reports", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+});
+
+export const insertWorkspaceSchema = createInsertSchema(workspaces).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertConnectionSchema = createInsertSchema(connections).omit({
+  id: true,
+  connectedAt: true,
+});
+
+export const insertWorkspaceMemberSchema = createInsertSchema(workspaceMembers).omit({
+  id: true,
+  addedAt: true,
+});
+
+export const insertNomenclaturePropertySchema = createInsertSchema(nomenclatureProperties).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertCreativeSchema = createInsertSchema(creatives).omit({
@@ -75,6 +139,14 @@ export const insertRecentReportSchema = createInsertSchema(recentReports).omit({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type Workspace = typeof workspaces.$inferSelect;
+export type InsertWorkspace = z.infer<typeof insertWorkspaceSchema>;
+export type Connection = typeof connections.$inferSelect;
+export type InsertConnection = z.infer<typeof insertConnectionSchema>;
+export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
+export type InsertWorkspaceMember = z.infer<typeof insertWorkspaceMemberSchema>;
+export type NomenclatureProperty = typeof nomenclatureProperties.$inferSelect;
+export type InsertNomenclatureProperty = z.infer<typeof insertNomenclaturePropertySchema>;
 export type Creative = typeof creatives.$inferSelect;
 export type InsertCreative = z.infer<typeof insertCreativeSchema>;
 export type SavedReport = typeof savedReports.$inferSelect;
