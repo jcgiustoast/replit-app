@@ -119,10 +119,6 @@ export function WorkspaceSwitcher({ onSettingsClick }: WorkspaceSwitcherProps) {
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup>
-              <CommandItem onSelect={handleSettings} data-testid="workspace-option-settings">
-                <Camera className="mr-2 h-4 w-4" />
-                <span>Snapshots</span>
-              </CommandItem>
               <CommandItem onSelect={handleSettings} data-testid="workspace-option-workspace-settings">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Workspace settings</span>

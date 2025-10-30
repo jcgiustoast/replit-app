@@ -53,19 +53,19 @@ export default function Settings() {
 
   // Fetch connections for the current workspace
   const { data: connections = [] } = useQuery<Connection[]>({
-    queryKey: ["/api/connections", currentWorkspace?.id],
+    queryKey: [`/api/connections?workspaceId=${currentWorkspace?.id}`],
     enabled: !!currentWorkspace?.id,
   });
 
   // Fetch workspace members
   const { data: members = [] } = useQuery<WorkspaceMember[]>({
-    queryKey: ["/api/workspace-members", currentWorkspace?.id],
+    queryKey: [`/api/workspace-members?workspaceId=${currentWorkspace?.id}`],
     enabled: !!currentWorkspace?.id,
   });
 
   // Fetch nomenclature properties
   const { data: nomenclatureProps = [] } = useQuery<NomenclatureProperty[]>({
-    queryKey: ["/api/nomenclature-properties", currentWorkspace?.id],
+    queryKey: [`/api/nomenclature-properties?workspaceId=${currentWorkspace?.id}`],
     enabled: !!currentWorkspace?.id,
   });
 
