@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
+  SidebarHeader,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import {
   Tooltip,
   TooltipContent,
@@ -41,7 +43,7 @@ const folderIconMap: Record<string, any> = {
 };
 
 export function AppSidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   
   const { data: savedReports = [] } = useQuery<SavedReport[]>({
@@ -72,14 +74,16 @@ export function AppSidebar() {
     },
   });
 
+  const handleSettingsClick = () => {
+    setLocation("/settings");
+  };
+
   return (
     <Sidebar>
+      <SidebarHeader>
+        <WorkspaceSwitcher onSettingsClick={handleSettingsClick} />
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <div className="px-4 py-6">
-            <h1 className="text-xl font-semibold">HEXCLAD</h1>
-          </div>
-        </SidebarGroup>
 
         <SidebarGroup>
           <SidebarGroupContent>

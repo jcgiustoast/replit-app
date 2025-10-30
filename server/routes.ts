@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { workspaces } from "@shared/schema";
 import { insertSavedReportSchema, insertFolderSchema, insertRecentReportSchema, insertWorkspaceSchema, insertConnectionSchema, insertWorkspaceMemberSchema, insertNomenclaturePropertySchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -9,6 +11,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // use storage to perform CRUD operations on the storage interface
   // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+
+  // Get demo user (temporary for development)
+  app.get("/api/users/demo", async (req, res) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ error: "Demo user not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch demo user" });
+    }
+  });
 
   // Get all saved reports
   app.get("/api/saved-reports", async (req, res) => {
@@ -140,14 +155,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Workspace routes
+  app.get("/api/workspaces/all", async (req, res) => {
+    try {
+      // For now, return all workspaces
+      // In production, this should filter by authenticated user
+      const allWorkspaces = await db.select().from(workspaces);
+      res.json(allWorkspaces);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch workspaces" });
+    }
+  });
+
   app.get("/api/workspaces", async (req, res) => {
     try {
       const userId = req.query.userId as string;
       if (!userId) {
         return res.status(400).json({ error: "userId is required" });
       }
-      const workspaces = await storage.getWorkspaces(userId);
-      res.json(workspaces);
+      const userWorkspaces = await storage.getWorkspaces(userId);
+      res.json(userWorkspaces);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch workspaces" });
     }

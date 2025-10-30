@@ -1,6 +1,6 @@
 import { users, workspaces, connections, workspaceMembers, nomenclatureProperties, savedReports, folders, recentReports, type User, type InsertUser, type Workspace, type InsertWorkspace, type Connection, type InsertConnection, type WorkspaceMember, type InsertWorkspaceMember, type NomenclatureProperty, type InsertNomenclatureProperty, type SavedReport, type InsertSavedReport, type Folder, type InsertFolder, type RecentReport, type InsertRecentReport } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, inArray } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -89,7 +89,7 @@ export class DatabaseStorage implements IStorage {
     const workspaceIds = memberships.map(m => m.workspaceId);
     if (workspaceIds.length === 0) return [];
     
-    return await db.select().from(workspaces).where(sql`${workspaces.id} = ANY(${workspaceIds})`);
+    return await db.select().from(workspaces).where(inArray(workspaces.id, workspaceIds));
   }
 
   async getWorkspace(id: string): Promise<Workspace | undefined> {
