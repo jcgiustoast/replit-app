@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "claude-toolkit": {
+      "source": {
+        "source": "github",
+        "repo": "jcgiustoast/claude-toolkit"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "jcg@claude-toolkit": true,
+    "superpowers@claude-plugins-official": true
+  }
+}
